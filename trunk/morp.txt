@@ -1,17 +1,12 @@
 "morp"
 {
 	"base"		"sandbox"
-    "title"  "Modular Roleplay"
-    "version"   0.0.1"
-    "menusystem"	"1"
+	"title"		"Modular Roleplay"
+	"maps"		"^rp_"
+	"menusystem"	"1"
 
-    "author_name"   "TheLastPenguin, Dev DotEXE"
-    "author_email"  "thelastpenguin212@gmail.com"
-    "author_url"    "http://lastpenguin.com/"
-
-    "maps"  "^rp_"
-
-    "icon"  ""
-    "info"  ""
-    "hide"  "0"
+	"settings"
+	{
+		// TODO: put some settings here
+	}
 }
