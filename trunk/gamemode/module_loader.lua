@@ -1,28 +1,21 @@
-local ModuleHooks = {}
+local moduleHooks = {}
+function MORP.ModuleHooksTbl()
+	return moduleHooks
+end
 
 -- we override the default hook call system to give us controle first.
 -- this means module hooks will always be called FIRST before everything else.
-if( not HOOKCALL_OVERRIDEN )then
-	local oldCall = hook.Call
-	hook.Call = function( name, gmode, ... )
-		local arg = {...}
-		local res = {MORP:CallModuleHook( name, ... )}
-		if( #res == 0 )then
-			return oldCall( name, gmode, ... )
-		else
-			return unpack( res )
-		end
-	end
+if(SERVER)then
+AddCSLuaFile("hook.lua")
 end
-HOOKCALL_OVERRIDEN = true
+include("hook.lua")
 
-
-function MORP:CallModuleHook( name, ... )
-	if( not ModuleHooks[ name ] )then return end
-	local res
-	for k,v in SortedPairs( ModuleHooks[ name ] )do
-		res = {v(...)}
-		if( #res ~= 0 )then	return unpack( res  ) end
+function MORP:CallModuleHook( name, arg )
+	if( not moduleHooks[ name ] )then return end
+	
+	for k,v in SortedPairs( moduleHooks[ name ] )do
+		local a, b, c, d = v( GAMEMODE, unpack( arg ))
+		if( #a ~= nil )then	return a, b, c, d end
 	end
 	return nil
 end
@@ -52,8 +45,8 @@ local function RunModule( id, codestr )
 	local res = func()
 	for k,v in pairs( res )do
 		if( type( v ) == 'function' )then
-			if( not ModuleHooks[ k ] )then ModuleHooks[ k ] = {} end
-			table.insert( ModuleHooks[ k ], v )
+			if( not moduleHooks[ k ] )then moduleHooks[ k ] = {} end
+			table.insert( moduleHooks[ k ], v )
 		end
 	end
 end
