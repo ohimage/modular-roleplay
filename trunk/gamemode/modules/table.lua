@@ -1,10 +1,11 @@
+--[[
 <info>
 <name>table</name>
 <author>TheLastPenguin</author>
 <desc>Provides functionality involving tables.</desc>
 <instance>SHARED</instance>
 </info>
-
+]]
 
 table.flaten = function( tbl )
 	for k,v in pairs( tbl )do

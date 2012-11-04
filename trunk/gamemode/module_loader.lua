@@ -119,7 +119,7 @@ local function LoadModule( path )
 	
 	-- parse out the header and code parts of the module.
 	local header = string.sub( text, headerBegin, headerClose ) -- seperate off the header from the rest of the code.
-	local code = string.sub( text, headerClose + 8 )
+	local code = text
 	
 	-- find the instance ( SERVER, CLIENT, or SHARED )
 	local instance = ParseForProperty( header, 'instance' )
