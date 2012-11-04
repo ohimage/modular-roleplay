@@ -12,6 +12,7 @@ if table.Count(file.Find("*", "cstrike")) == 0 then
 end
 
 AddCSLuaFile("shared.lua")
+AddCSLuaFile("config.lua")
 AddCSLuaFile("module_loader.lua")
 
 include("shared.lua") -- load shared.lua first. Only extreamly general global functions should go there.
