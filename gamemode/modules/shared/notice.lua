@@ -1,29 +1,12 @@
+--[[
 <info>
 <name>notice</name>
 <author>TheLastPenguin</author>
 <desc>Provides notification functionality like chat text, and console printing.</desc>
 <instance>SHARED</instance>
 </info>
-
-
-PAdmin:LoadMsg("Loading lib/genaric_sh.lua")
-
-function PAMsgC( ... )
-	local arg = { ... }
-	local col = Color( 255, 255, 255, 255 )
-	for k,v in pairs( arg )do
-		if( type( v ) == "table" and ( v.r and v.g and v.b and v.a))then
-			col = v
-		elseif( type( v ) == "string" )then
-			MsgC(col, v )
-		elseif( type( v ) == "number" )then
-			MsgC(col, tostring( v ) )
-		elseif( type( v ) == "Player" )then
-			PAMsgC( unpack( PAdmin:FormatPlayerName( v ) ) )
-		end
-	end
-end
-
+]]
+ 
 if( SERVER )then
 	function BuildNotice( ply, ... )
 		local arg = { ... }
@@ -35,14 +18,14 @@ if( SERVER )then
 		if( not ply or ( not type( ply ) == "table" and player.IsConsole( ply ) ))then
 			table.insert( arg, 1, "PAdmin: " )
 			table.insert( arg, "\n" )
-			PAMsgC( unpack( arg ) )
+			MsgCTBL( unpack( arg ) )
 			return
 		end
 		if( type( ply ) == "table" and #ply == #player.GetAll())then
 			local arg = table.Copy( arg )
 			table.insert( arg, 1, "PAdmin: " )
 			table.insert( arg, "\n" )
-			PAMsgC( unpack( arg ) )
+			MsgCTBL( unpack( arg ) )
 		end
 		return arg
 	end
@@ -75,7 +58,7 @@ elseif( CLIENT )then
 		local lastCol = Color( 255, 255, 255, 255 )
 		for k,v in pairs(tbl)do
 			if( type( v ) == "Player" )then
-				local ntbl = {team.GetColor(v:Team(),v:Name() }
+				local ntbl = {team.GetColor(v:Team()),v:Name() }
 				ntbl[#ntbl + 1 ] = lastCol
 				tbl[ k ] = ntbl
 			elseif( type( v ) == "table" and v.r and v.g and v.b and v.a )then
@@ -91,7 +74,7 @@ elseif( CLIENT )then
 		local lastCol = Color( 255, 255, 255, 255 )
 		for k,v in pairs(tbl)do
 			if( type( v ) == "Player" )then
-				local ntbl = {team.GetColor(v:Team(),v:Name() }
+				local ntbl = {team.GetColor(v:Team() ),v:Name() }
 				ntbl[#ntbl + 1 ] = lastCol
 				tbl[ k ] = ntbl
 			elseif( type( v ) == "table" and v.r and v.g and v.b and v.a )then
@@ -99,6 +82,6 @@ elseif( CLIENT )then
 			end
 		end
 		table.flaten( tbl )
-		PAMsgC( unpack( tbl ) )
+		MsgCTBL( unpack( tbl ) )
 	end )
 end
