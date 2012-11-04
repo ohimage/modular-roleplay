@@ -1,4 +1,5 @@
 MORP = {} -- global table for gamemode variables.
+DeriveGamemode("sandbox")
 
 -- Checking if counterstrike is installed correctly
 if table.Count(file.Find("*", "cstrike")) == 0 then

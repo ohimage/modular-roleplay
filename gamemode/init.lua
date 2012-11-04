@@ -1,4 +1,5 @@
 MORP = {} -- global table for gamemode variables.
+DeriveGamemode("sandbox")
 
 -- Checking if counterstrike is installed correctly
 if table.Count(file.Find("*", "cstrike")) == 0 then
@@ -15,3 +16,11 @@ AddCSLuaFile("module_loader.lua")
 
 include("shared.lua") -- load shared.lua first. Only extreamly general global functions should go there.
 include("module_loader.lua")
+
+function GM:PlayerInitialSpawn( ply )
+	self.BaseClass:PlayerInitialSpawn( ply )
+end
+
+function GM:PlayerLoadout( ply )
+	self.BaseClass:PlayerLoadout( ply )
+end
