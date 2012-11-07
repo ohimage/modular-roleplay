@@ -1,3 +1,6 @@
+local GM = GM
+if( not GM and GM )then GM = GM end
+
 local moduleHooks = {}
 function MORP.ModuleHooksTbl()
 	return moduleHooks
@@ -5,21 +8,16 @@ end
 
 -- we override the default hook call system to give us controle first.
 -- this means module hooks will always be called FIRST before everything else.
-if(SERVER)then
-AddCSLuaFile("hook.lua")
-end
-include("hook.lua")
 
-function MORP:CallModuleHook( name, arg )
+function MORP:CallModuleHook( name, ... )
 	if( not moduleHooks[ name ] )then return end
 	
 	for k,v in SortedPairs( moduleHooks[ name ] )do
-		local a, b, c, d = v( GAMEMODE, unpack( arg ))
-		if( #a ~= nil )then	return a, b, c, d end
+		local a, b, c, d = v( GM, ...)
+		if( a ~= nil )then return a, b, c, d end
 	end
 	return nil
 end
-
 
 local function ParseForProperty( text, property )
 	local len = string.len( property )
@@ -40,11 +38,20 @@ local function RunModule( id, codestr )
 	local func = CompileString( code, id )
 	if( not func )then
 		MsgCTBL(MORP.color.red, "Failed to compile module "..id )
+		chat.AddText(MORP.color.red, "Failed to compile module "..id )
 		return false
 	end
 	local res = func()
 	for k,v in pairs( res )do
 		if( type( v ) == 'function' )then
+			GM[ k ] = function( GM, ... )
+				local a, b, c, d = MORP:CallModuleHook( k, ... )
+				if( a )then
+					return a, b, c, d
+				else
+					return GM.BaseClass[ k ]( GM,  ... )
+				end
+			end
 			if( not moduleHooks[ k ] )then moduleHooks[ k ] = {} end
 			table.insert( moduleHooks[ k ], v )
 		end
@@ -70,33 +77,39 @@ local function ProcessQue()
 			if( req )then
 				RequiredNum = #req
 				for _,j in pairs( req )do
-					if( table.HasValue( req, j ) )then
+					if( table.HasValue( loaded, j ) )then
 						RequiredNum = RequiredNum - 1
 					end
 				end
-			else
-				if( not req or RequiredNum == 0)then
-					MsgCTBL(MORP.color.white,"Running module "..v[3] )
-					RunModule( v[2], v[4] )
-					table.insert(loaded, v[3] )
-					que[k] = nil
-				end
+			end
+			if( not req or RequiredNum == 0)then
+				MsgCTBL(MORP.color.white,"Running module "..v[3].." with no requirements." )
+				RunModule( v[2], v[4] )
+				table.insert(loaded, v[3] )
+				que[k] = nil
 			end
 		end
 	end
-	if( #que == 0 )then
-		MsgCTBL(MORP.color.cyan,"Done loading modules!!!")
+	if( table.Count( que ) == 0 )then
+		MORP:LoadMessage('Done processing module que.')
 	else
-		ErrorNoHalt("REQUIREMENT ERROR. FAILED TO LOAD SOME MODULES. FORCING LOAD WITHOUT REQUIREMENTS.")
+		MsgCTBL(MORP.color.red,"REQUIREMENT ERROR. FAILED TO LOAD SOME MODULES. FORCING LOAD WITHOUT REQUIREMENTS.\n")
 		for k,v in pairs( que )do
+			MsgCTBL(MORP.color.orange,"FORCING MODULE LOAD "..v[3])
 			RunModule( v[2], v[4] )
 		end
 	end
+	MORP:LoadMessage('Loaded ', tostring( #loaded + #que ), ' modules.' )
+	que = {}
 end
 
 local function LoadModule( path )
 	-- read the module from the file...
 	local text = file.Read(path, "LUA" )
+	if(not text )then
+		ErrorNoHalt( "NO CODE IN "..path )
+		return
+	end
 	-- find the header inside the info tags.
 	local headerBegin = string.find( text, '<info>')
 	local headerClose = string.find( text, '</info>')
@@ -143,9 +156,20 @@ local function LoadModule( path )
 	
 	-- load the requirement list.
 	local ReqStr = (ParseForProperty( header, 'require' ))
+	local req = nil
 	if( ReqStr )then
 		ReqStr = string.gsub( ReqStr, ' ', '' )
-		local req = string.Explode(',', ReqStr )
+		local rawReq = string.Explode(',', ReqStr )
+		req = {}
+		for k,v in pairs( rawReq )do
+			if( CLIENT and string.find( v, 'sv_' ) )then
+				MsgCTBL(MORP.color.grey,"Skipping sv requirement on client")
+			elseif( SERVER and string.find( v, 'cl_' ) )then
+				MsgCTBL(MORP.color.grey,"Skipping cl requirement on server")
+			else
+				table.insert( req, v )
+			end
+		end
 		MsgCTBL(MORP.color.grey,"Requires "..table.concat( req, ", ") )
 	end
 	-- run the module.
@@ -168,10 +192,6 @@ local function LoadModule( path )
 end
 
 local function ScanForModules( moduleFolder )
-	MsgCTBL(MORP.color.white,[[
-	========================
-	= Scanning for Modules =
-	========================]])
 	local files, _ = file.Find(moduleFolder .. "*.lua", "LUA")
 	for k,v in pairs(files) do
 		print("Found module "..v)
@@ -179,11 +199,36 @@ local function ScanForModules( moduleFolder )
 		LoadModule( curPath )
 	end
 end
-ScanForModules( GM.FolderName.."/gamemode/modules/" )
-if(SERVER)then
-	ScanForModules( GM.FolderName.."/gamemode/modules/server/" )
-end
-ScanForModules( GM.FolderName.."/gamemode/modules/client/" )
-ScanForModules( GM.FolderName.."/gamemode/modules/shared/" )
 
-ProcessQue() -- now that we have our list, run them.
+local function LoadProcess()
+	MORP:LoadMessageBig('MoRP Scanning for CORE Modules.')
+
+	ScanForModules( GM.FolderName.."/gamemode/core_modules/" )
+	MORP:LoadMessage('Processing CORE Module Que')
+	ProcessQue() -- now that we have our list, run them.
+	MORP:LoadMessageBig('MoRP Scanning for REGULAR Modules')
+	ScanForModules( GM.FolderName.."/gamemode/modules/" )
+	MORP:LoadMessage('Processing REGULAR Module Que')
+	ProcessQue()
+end
+LoadProcess()
+
+if(SERVER)then
+	util.AddNetworkString('MoRP_ReloadModules')
+	concommand.Add("MoRP_ReloadModules_SV",function()
+		MORP:LoadMessageBig(MORP.color.cyan,'MoRP Reloading Modules.')
+		LoadProcess()
+		for k,v in pairs(player.GetAll())do
+			hook.Run('PlayerInitialSpawn',v)
+			hook.Run('PlayerSpawn',v )
+			v:StripWeapons()
+			hook.Run('PlayerLoadout',v)
+			hook.Run('PlayerAuthed', v, v:SteamID(), v:UniqueID() )
+		end
+	end)
+else
+	net.Receive('MoRP_ReloadModules',function()
+		MORP:LoadMessageBig(MORP.color.cyan,'MoRP Reloading Modules.')
+		LoadProcess()
+	end)
+end

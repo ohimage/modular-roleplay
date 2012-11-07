@@ -1,6 +1,6 @@
 --[[
 <info>
-<name>notice</name>
+<name>sh_notice</name>
 <author>TheLastPenguin</author>
 <desc>Provides notification functionality like chat text, and console printing.</desc>
 <instance>SHARED</instance>

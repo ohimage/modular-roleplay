@@ -4,7 +4,7 @@
 <author>TheLastPenguin</author>
 <desc>Functions to create and manage teams.</desc>
 <instance>SHARED</instance>
-<require>notice,chat</require>
+<require>sh_notice,sv_chat</require>
 </info>
 ]]
 
@@ -16,12 +16,17 @@ local requiredValues = {
 	{'name', nil },
 	{'model', nil },
 	{'vote', false },
-	{'CustomCheck', function( ply )
-		return hook.Run("MORP_ChangeTeam", ply)
-	end },
 	{'command', nil },
-	{'color', nil }
+	{'color', Color(155,0,155) },
+	{'limit',nil}
 }
+--[[
+OTHER VALUES:
+CustomCheck - function passed the player as the only arguement.
+IsVisible - can it be seen on the menu. Default will be true.
+MustChangeFrom - list of teams that are required to be this one.
+HOOK_<name> - hooks coming soon
+]]
 function MORP:AddCustomTeam( name, tbl )
 	MsgCTBL(MORP.color.white,"Registered team "..name )
 	tbl['name'] = name
@@ -38,11 +43,25 @@ function MORP:AddCustomTeam( name, tbl )
 		end
 	end
 	tbl.id = #teams + 1
-	teams[ id ] = tbl
-	team.SetUp( id, name, tbl.color )
+	teams[ tbl.id ] = tbl.id
+	team.SetUp( tbl.id, tbl.name, tbl.color )
 	if(SERVER)then
 		MORP:AddChatCommand( tbl.command, function( ply )
-			ply:SetTeam( id )
+			print("OH SNAP DAWG")
+			MORP:ChatMessage(player.GetAll(), ply, " changed job to ", tbl.color, tbl.name )
+			ply:SetTeam( tbl.id )
 		end)
 	end
 end
+
+
+MORP:AddCustomTeam( 'Developer', {
+	model = 'models/breen.mdl',
+	color = MORP.color.cyan,
+	vote = false,
+	command = 'developer',
+	limit = -1,
+	CustomCheck = function( ply )
+		return ply:IsMORPDeveloper( )
+	end
+})
