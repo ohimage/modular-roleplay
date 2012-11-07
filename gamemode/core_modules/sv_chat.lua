@@ -1,10 +1,10 @@
 --[[
 <info>
-<name>chat</name>
+<name>sv_chat</name>
 <author>TheLastPenguin</author>
 <desc>Server side chat system.</desc>
 <instance>SERVER</instance>
-<require>notice</require>
+<require>sh_notice</require>
 </info>
 ]]
 
@@ -49,11 +49,27 @@ local function RunCommand(ply, text )
 	end
 end
 
-function GM:PlayerSay( ply, text, teamChat )
-	if( not (string.len( text ) > 3) )then
-		MORP:ChatMessage( ply, MORP.color.red, "Message must be more than 3 letters long.")
+
+-- we make a global table for this, so reloads wont remove all hooks forever and ever and ever... echo...
+local otherhooks = MORP_CHATCMDSREPLACED or {}
+MORP_CHATCMDSREPLACED = otherhooks
+
+function GM:PlayerSay(ply, text, teamonly, dead)
+	text = string.Trim( text )
+	-- call the other hooks like a baws.
+	for k,v in SortedPairs( otherhooks, false )do
+		if type(v) == "function" then
+			local newText = v(ply, text, teamonly, dead)
+			if( newText )then
+				text = newText
+				break
+			end
+		end
 	end
-	if( text[1] == '/')then
+	
+	if( string.len( text ) == 0 )then
+		--MORP:ChatMessage( ply, MORP.color.red, "Message must be more than 3 letters long.")
+	elseif( text[1] == '/')then
 		return RunCommand( ply, string.sub( text, 2 ) ) or ''
 	else
 		local players = player.GetAll()
@@ -61,3 +77,20 @@ function GM:PlayerSay( ply, text, teamChat )
 	end
 	return ""
 end
+
+local function ReplaceChatHooks()
+	if not hook.GetTable()['PlayerSay'] then return end
+	for k,v in pairs(hook.GetTable()['PlayerSay']) do
+		print("Removin hook "..k)
+		otherhooks[k] = v
+		hook.Remove("PlayerSay", k)
+	end
+	PrintTable(hook.GetTable().PlayerSay)
+	for a,b in pairs(otherhooks) do
+		if type(b) ~= "function" then
+			otherhooks[a] = nil
+		end
+	end
+end
+
+timer.Simple(1, ReplaceChatHooks)

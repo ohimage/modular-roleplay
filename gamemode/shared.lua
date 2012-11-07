@@ -9,10 +9,8 @@ if( SERVER )then
 else
 	instanceColor = Color( 0, 255, 255 ) -- cyan for clients.
 end 
-function MsgCTBL( ... )
+function MsgCTBLRaw( ... )
 	local arg = {...}
-	table.insert( arg, 1 , instanceColor )
-	table.insert( arg, 2 , '[MoRP]' )
 	local color = MORP.color.white
 	for k,v in SortedPairs( arg )do
 		if( type( v ) == 'table' and v.r and v.g and v.b and v.a )then
@@ -29,5 +27,33 @@ function MsgCTBL( ... )
 			end
 		end
 	end
+end
+
+function MsgCTBL( ... )
+	MsgCTBLRaw( instanceColor, '[MoRP] ', ... )
 	print('')
+end
+function MORP:LoadMessageBig( ... )
+	local msg = {...}
+	local msgLen = 0
+	for k,v in pairs( msg )do
+		if( type( v ) == 'string' )then
+			msgLen = msgLen + string.len( v )
+		end
+	end
+	MsgCTBLRaw(instanceColor,'================================================================================\n| ')
+	MsgCTBLRaw(...)
+	MsgCTBLRaw(string.format('%'..math.max(76 - msgLen,1)..'s', ''),instanceColor,' |\n================================================================================\n')
+end
+function MORP:LoadMessage( ... )
+	local msg = {...}
+	local msgLen = 0
+	for k,v in pairs( msg )do
+		if( type( v ) == 'string' )then
+			msgLen = msgLen + string.len( v )
+		end
+	end
+	MsgCTBLRaw(instanceColor,'| ')
+	MsgCTBLRaw(...)
+	MsgCTBLRaw(string.format('%'..math.max(76 - msgLen,1)..'s', ''),instanceColor,' |\n' )
 end
