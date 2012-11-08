@@ -17,3 +17,11 @@ MORP.color.white = Color(255,255,255)
 -- Module Settings
 -- chat
 cfg.BlockedCommands = {} -- add a command here to disable it. EX: { 'ooc', '/', 'oc' } will disable OCC chat.
+cfg.ChatFilters = {
+	['fuck'] = 'f***',
+	['gay'] = 'happy',
+	['bitch'] = 'b****',
+	['hell'] = 'heaven'
+}
+-- Data Manager - CHANGING THEASE VALUES MAY BREAK STUFF AND IS NOT ADVISED
+cfg.TablePrefix = 'MoRP_'

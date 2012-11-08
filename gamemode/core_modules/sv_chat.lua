@@ -54,9 +54,9 @@ end
 local otherhooks = MORP_CHATCMDSREPLACED or {}
 MORP_CHATCMDSREPLACED = otherhooks
 
-function GM:PlayerSay(ply, text, teamonly, dead)
+function GM:OnPlayerChat(ply, text, teamonly, dead)
 	text = string.Trim( text )
-	-- call the other hooks like a baws.
+	/*-- call the other hooks like a baws.
 	for k,v in SortedPairs( otherhooks, false )do
 		if type(v) == "function" then
 			local newText = v(ply, text, teamonly, dead)
@@ -66,6 +66,7 @@ function GM:PlayerSay(ply, text, teamonly, dead)
 			end
 		end
 	end
+	*/
 	
 	if( string.len( text ) == 0 )then
 		--MORP:ChatMessage( ply, MORP.color.red, "Message must be more than 3 letters long.")
@@ -78,6 +79,7 @@ function GM:PlayerSay(ply, text, teamonly, dead)
 	return ""
 end
 
+/*
 local function ReplaceChatHooks()
 	if not hook.GetTable()['PlayerSay'] then return end
 	for k,v in pairs(hook.GetTable()['PlayerSay']) do
@@ -94,3 +96,4 @@ local function ReplaceChatHooks()
 end
 
 timer.Simple(1, ReplaceChatHooks)
+*/
