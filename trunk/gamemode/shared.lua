@@ -33,18 +33,8 @@ function MsgCTBL( ... )
 	MsgCTBLRaw( instanceColor, '[MoRP] ', ... )
 	print('')
 end
-function MORP:LoadMessageBig( ... )
-	local msg = {...}
-	local msgLen = 0
-	for k,v in pairs( msg )do
-		if( type( v ) == 'string' )then
-			msgLen = msgLen + string.len( v )
-		end
-	end
-	MsgCTBLRaw(instanceColor,'================================================================================\n| ')
-	MsgCTBLRaw(...)
-	MsgCTBLRaw(string.format('%'..math.max(76 - msgLen,1)..'s', ''),instanceColor,' |\n================================================================================\n')
-end
+
+-- Gotta have our sexy looking load messages for the load process.
 function MORP:LoadMessage( ... )
 	local msg = {...}
 	local msgLen = 0
@@ -56,4 +46,16 @@ function MORP:LoadMessage( ... )
 	MsgCTBLRaw(instanceColor,'| ')
 	MsgCTBLRaw(...)
 	MsgCTBLRaw(string.format('%'..math.max(76 - msgLen,1)..'s', ''),instanceColor,' |\n' )
+end
+function MORP:LoadMessageBig( ... )
+	local msg = {...}
+	local msgLen = 0
+	for k,v in pairs( msg )do
+		if( type( v ) == 'string' )then
+			msgLen = msgLen + string.len( v )
+		end
+	end
+	MsgCTBLRaw(instanceColor,'================================================================================\n')
+	MORP:LoadMessage( ... )
+	MsgCTBLRaw(instanceColor,'================================================================================\n')
 end

@@ -1,5 +1,4 @@
-local GM = GM
-if( not GM and GM )then GM = GM end
+if( not GAMEMODE and GM )then GAMEMODE = GM end
 
 local moduleHooks = {}
 function MORP.ModuleHooksTbl()
@@ -13,7 +12,7 @@ function MORP:CallModuleHook( name, ... )
 	if( not moduleHooks[ name ] )then return end
 	
 	for k,v in SortedPairs( moduleHooks[ name ] )do
-		local a, b, c, d = v( GM, ...)
+		local a, b, c, d = v( GAMEMODE, ...)
 		if( a ~= nil )then return a, b, c, d end
 	end
 	return nil
@@ -33,23 +32,22 @@ local function ParseForProperty( text, property )
 	return value
 end
 local function RunModule( id, codestr )
-	local code = string.format('%s\n%s\n%s\n',
-		'local GM = {}',codestr, 'return GM' )
-	local func = CompileString( code, id )
-	if( not func )then
-		MsgCTBL(MORP.color.red, "Failed to compile module "..id )
-		chat.AddText(MORP.color.red, "Failed to compile module "..id )
-		return false
-	end
-	local res = func()
+	local OldGM = GM
+	GM = {}
+	include( id )
+	local res = GM
+	GM = OldGM
+	
 	for k,v in pairs( res )do
 		if( type( v ) == 'function' )then
-			GM[ k ] = function( GM, ... )
+			GAMEMODE[ k ] = function( GAMEMODE, ... )
 				local a, b, c, d = MORP:CallModuleHook( k, ... )
 				if( a )then
 					return a, b, c, d
 				else
-					return GM.BaseClass[ k ]( GM,  ... )
+					if( GAMEMODE.BaseClass[ k ] )then
+						return GAMEMODE.BaseClass[ k ]( GAMEMODE,  ... )
+					end
 				end
 			end
 			if( not moduleHooks[ k ] )then moduleHooks[ k ] = {} end
@@ -83,7 +81,7 @@ local function ProcessQue()
 				end
 			end
 			if( not req or RequiredNum == 0)then
-				MsgCTBL(MORP.color.white,"Running module "..v[3].." with no requirements." )
+				MsgCTBL(MORP.color.white,#loaded + 1,") Running module "..v[3].." with no requirements." )
 				RunModule( v[2], v[4] )
 				table.insert(loaded, v[3] )
 				que[k] = nil
@@ -203,13 +201,14 @@ end
 local function LoadProcess()
 	MORP:LoadMessageBig('MoRP Scanning for CORE Modules.')
 
-	ScanForModules( GM.FolderName.."/gamemode/core_modules/" )
+	ScanForModules( GAMEMODE.FolderName.."/gamemode/core_modules/" )
 	MORP:LoadMessage('Processing CORE Module Que')
 	ProcessQue() -- now that we have our list, run them.
 	MORP:LoadMessageBig('MoRP Scanning for REGULAR Modules')
-	ScanForModules( GM.FolderName.."/gamemode/modules/" )
+	ScanForModules( GAMEMODE.FolderName.."/gamemode/modules/" )
 	MORP:LoadMessage('Processing REGULAR Module Que')
 	ProcessQue()
+	hook.Run('ModulesLoaded')
 end
 LoadProcess()
 
@@ -217,18 +216,16 @@ if(SERVER)then
 	util.AddNetworkString('MoRP_ReloadModules')
 	concommand.Add("MoRP_ReloadModules_SV",function()
 		MORP:LoadMessageBig(MORP.color.cyan,'MoRP Reloading Modules.')
-		LoadProcess()
+		include(GAMEMODE.FolderName..'/gamemode/module_loader.lua')
 		for k,v in pairs(player.GetAll())do
 			hook.Run('PlayerInitialSpawn',v)
-			hook.Run('PlayerSpawn',v )
 			v:StripWeapons()
 			hook.Run('PlayerLoadout',v)
-			hook.Run('PlayerAuthed', v, v:SteamID(), v:UniqueID() )
 		end
 	end)
 else
 	net.Receive('MoRP_ReloadModules',function()
 		MORP:LoadMessageBig(MORP.color.cyan,'MoRP Reloading Modules.')
-		LoadProcess()
+		include(GAMEMODE.FolderName..'/gamemode/module_loader.lua')
 	end)
 end
