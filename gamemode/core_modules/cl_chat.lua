@@ -4,7 +4,6 @@
 <author>TheLastPenguin</author>
 <desc>Client side chat system.</desc>
 <instance>CLIENT</instance>
-<require></require>
 </info>
 ]]
 if(SERVER)then return end
@@ -21,11 +20,11 @@ end
 function GM:ChatTextChanged( text )
 	text = string.Trim( text )
 	if( text[1] == '/' )then
-		print("Running autocomplete algorithms for MoRP.")
 		-- find the first space, used to devide up command and the arguement.
 		local space = string.find( text, ' ' )
 		if( space )then -- if we find a space, then go about getting a more specialised list for that command.
 			local command = string.sub( text, 2, space )
+			print("Command is "..command )
 		else -- we didnt find a space, so lets generate a list of commands they could be looking for instead.
 			local options = {}
 			for k,v in pairs( autoComplete )do
@@ -38,3 +37,15 @@ function GM:ChatTextChanged( text )
 		return
 	end
 end
+
+hook.Add("Think","MOUSENDSHIT",function()
+	if( input.IsKeyDown( MOUSE_WHEEL_DOWN ) or input.IsKeyDown( MOUSE_WHEEL_UP ))then
+		print("MOUSE WEEL!")
+	end
+end)
+
+local function OCCHandler( arg )
+	return 'Players Can Hear:', 'Everyone'
+end
+
+function MORP:AddAutoCompleteHandler( '//,func )
