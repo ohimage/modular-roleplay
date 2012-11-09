@@ -15,7 +15,11 @@ MORP.color.white = Color(255,255,255)
 
 
 -- Module Settings
--- chat
+
+-- ECONOMY
+cfg.StartingBalance = 750
+
+-- CHAT
 cfg.BlockedCommands = {} -- add a command here to disable it. EX: { 'ooc', '/', 'oc' } will disable OCC chat.
 cfg.ChatFilters = {
 	['fuck'] = 'f***',

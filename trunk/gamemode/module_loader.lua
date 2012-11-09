@@ -211,6 +211,7 @@ local function LoadProcess()
 	hook.Run('ModulesLoaded')
 end
 LoadProcess()
+PrintTable( moduleHooks )
 
 if(SERVER)then
 	util.AddNetworkString('MoRP_ReloadModules')
@@ -218,14 +219,15 @@ if(SERVER)then
 		MORP:LoadMessageBig(MORP.color.cyan,'MoRP Reloading Modules.')
 		include(GAMEMODE.FolderName..'/gamemode/module_loader.lua')
 		for k,v in pairs(player.GetAll())do
-			hook.Run('PlayerInitialSpawn',v)
+			MORP:LoadMessage("Calling load hooks on player "..v:Name() )
+			v:SendLua([[
+print("Reloading MoRP.")
+MORP:LoadMessageBig(MORP.color.cyan,'MoRP Reloading Modules.')
+include(GAMEMODE.FolderName..'/gamemode/module_loader.lua')
+			]])
+			hook.Call('PlayerInitialSpawn',GAMEMODE,v)
 			v:StripWeapons()
-			hook.Run('PlayerLoadout',v)
+			hook.Call('PlayerLoadout',GAMEMODE,v)
 		end
-	end)
-else
-	net.Receive('MoRP_ReloadModules',function()
-		MORP:LoadMessageBig(MORP.color.cyan,'MoRP Reloading Modules.')
-		include(GAMEMODE.FolderName..'/gamemode/module_loader.lua')
 	end)
 end
