@@ -1,0 +1,14 @@
+"neorp"
+{
+	"base"		"sandbox"
+	"title"		"NeoRP"
+	"maps"		"^rp_"
+	"menusystem"	"1"
+
+	"settings"
+	{
+		"sv_errorkicknum" "0"
+		"sbox_maxprops" "100"
+		"sbox_maxnpcs" "20"
+	}
+}
