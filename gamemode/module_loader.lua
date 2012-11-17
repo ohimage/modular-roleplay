@@ -1,14 +1,22 @@
+/*
+NOTE TO SELF:
+Will have to recode this system to stream a list of modules to users.
+Also need to figure out the issue with player teams not setting properly on spawn.
+*/
+
+local NRP = NRP
+
 if( not GAMEMODE and GM )then GAMEMODE = GM end
 
 local moduleHooks = {}
-function MORP.ModuleHooksTbl()
+function NRP.ModuleHooksTbl()
 	return moduleHooks
 end
 
 -- we override the default hook call system to give us controle first.
 -- this means module hooks will always be called FIRST before everything else.
 
-function MORP:CallModuleHook( name, ... )
+function NRP:CallModuleHook( name, ... )
 	if( not moduleHooks[ name ] )then return end
 	
 	for k,v in SortedPairs( moduleHooks[ name ] )do
@@ -41,10 +49,10 @@ local function RunModule( id, codestr )
 	for k,v in pairs( res )do
 		if( type( v ) == 'function' )then
 			GAMEMODE[ k ] = function( GAMEMODE, ... )
-				local a, b, c, d = MORP:CallModuleHook( k, ... )
+				local a, b, c, d = NRP:CallModuleHook( k, ... )
 				if( a )then
 					return a, b, c, d
-				else
+				elseif( moduleHooks[ k ] == nil)then
 					if( GAMEMODE.BaseClass[ k ] )then
 						return GAMEMODE.BaseClass[ k ]( GAMEMODE,  ... )
 					end
@@ -58,7 +66,7 @@ end
 
 local que = {}
 local function QueModule( req, path, name, code )
-	MsgCTBL(MORP.color.grey,"Added module "..name.." to que.")
+	MsgCTBL(NRP.color.grey,"Added module "..name.." to que.")
 	table.insert( que, { req, path, name, code })
 end
 local function ProcessQue()
@@ -81,7 +89,7 @@ local function ProcessQue()
 				end
 			end
 			if( not req or RequiredNum == 0)then
-				MsgCTBL(MORP.color.white,#loaded + 1,") Running module "..v[3].." with no requirements." )
+				MsgCTBL(NRP.color.white,#loaded + 1,") Running module "..v[3] )
 				RunModule( v[2], v[4] )
 				table.insert(loaded, v[3] )
 				que[k] = nil
@@ -89,19 +97,19 @@ local function ProcessQue()
 		end
 	end
 	if( table.Count( que ) == 0 )then
-		MORP:LoadMessage('Done processing module que.')
+		NRP:LoadMessage('Done processing module que.')
 	else
-		MsgCTBL(MORP.color.red,"REQUIREMENT ERROR. FAILED TO LOAD SOME MODULES. FORCING LOAD WITHOUT REQUIREMENTS.\n")
+		MsgCTBL(NRP.color.red,"REQUIREMENT ERROR. FAILED TO LOAD SOME MODULES. FORCING LOAD WITHOUT REQUIREMENTS.\n")
 		for k,v in pairs( que )do
-			MsgCTBL(MORP.color.orange,"FORCING MODULE LOAD "..v[3])
+			MsgCTBL(NRP.color.orange,"FORCING MODULE LOAD "..v[3])
 			RunModule( v[2], v[4] )
 		end
 	end
-	MORP:LoadMessage('Loaded ', tostring( #loaded + #que ), ' modules.' )
+	NRP:LoadMessage('Loaded ', tostring( #loaded + #que ), ' modules.' )
 	que = {}
 end
 
-local function LoadModule( path )
+local function LoadModule( path, relativePath )
 	-- read the module from the file...
 	local text = file.Read(path, "LUA" )
 	if(not text )then
@@ -141,15 +149,15 @@ local function LoadModule( path )
 	local author = (ParseForProperty( header, 'author' ) or '[author not found]')
 	
 	if( instance == 'SHARED' or ( instance == 'CLIENT' and CLIENT ) or ( instance == 'SERVER' and SERVER ) )then
-	MsgCTBL( MORP.color.white, "Loading module "..name,
+	MsgCTBL( NRP.color.white, "Loading module "..name,
 			"\n\t\tDescription: ", desc,
 			"\n\t\tAuthor: ", author,
 			"\n\t\tInstance: ", instance)
 	else
-		MsgCTBL( MORP.color.orange, "Skipping "..instance.. " module ".. name )
+		MsgCTBL( NRP.color.orange, "Skipping "..instance.. " module ".. name )
 	end
 	if(instance == 'CLIENT' or instance == 'SHARED' )then
-		MsgCTBL( MORP.color.grey, "Adding "..name.." as a clientside file.")
+		MsgCTBL( NRP.color.grey, "Adding "..name.." as a clientside file.")
 	end
 	
 	-- load the requirement list.
@@ -161,14 +169,14 @@ local function LoadModule( path )
 		req = {}
 		for k,v in pairs( rawReq )do
 			if( CLIENT and string.find( v, 'sv_' ) )then
-				MsgCTBL(MORP.color.grey,"Skipping sv requirement on client")
+				MsgCTBL(NRP.color.grey,"Skipping sv requirement on client")
 			elseif( SERVER and string.find( v, 'cl_' ) )then
-				MsgCTBL(MORP.color.grey,"Skipping cl requirement on server")
+				MsgCTBL(NRP.color.grey,"Skipping cl requirement on server")
 			else
 				table.insert( req, v )
 			end
 		end
-		MsgCTBL(MORP.color.grey,"Requires "..table.concat( req, ", ") )
+		MsgCTBL(NRP.color.grey,"Requires "..table.concat( req, ", ") )
 	end
 	-- run the module.
 	if( instance == 'SERVER' and SERVER)then
@@ -177,52 +185,53 @@ local function LoadModule( path )
 		if(CLIENT)then
 			QueModule( req, path, name, code )
 		else
-			AddCSLuaFile( path )
+			MsgCTBL(NRP.color.grey,'Added CS Lua File '..relativePath )
+			AddCSLuaFile( relativePath )
 		end
 	elseif( instance == 'SHARED' )then 
 		QueModule(req, path, name, code )
 		if(SERVER)then
-			AddCSLuaFile( path )
+				MsgCTBL(NRP.color.grey,'Added CS Lua File '..relativePath )
+				AddCSLuaFile( relativePath )
 		end
 	else
 		ErrorNoHalt("Invalid instance specified "..instance.." Path: "..path )
 	end
 end
 
-local function ScanForModules( moduleFolder )
+local function ScanForModules( moduleFolder, relativeFolder )
 	local files, _ = file.Find(moduleFolder .. "*.lua", "LUA")
 	for k,v in pairs(files) do
 		print("Found module "..v)
 		local curPath = moduleFolder..v
-		LoadModule( curPath )
+		local relativePath = relativeFolder..v
+		LoadModule( curPath, relativePath )
 	end
 end
 
 local function LoadProcess()
-	MORP:LoadMessageBig('MoRP Scanning for CORE Modules.')
+	NRP:LoadMessageBig('NRP Scanning for CORE Modules.')
 
-	ScanForModules( GAMEMODE.FolderName.."/gamemode/core_modules/" )
-	MORP:LoadMessage('Processing CORE Module Que')
+	ScanForModules( GAMEMODE.FolderName.."/gamemode/core_modules/", "core_modules/")
+	NRP:LoadMessage('Processing CORE Module Que')
 	ProcessQue() -- now that we have our list, run them.
-	MORP:LoadMessageBig('MoRP Scanning for REGULAR Modules')
-	ScanForModules( GAMEMODE.FolderName.."/gamemode/modules/" )
-	MORP:LoadMessage('Processing REGULAR Module Que')
+	NRP:LoadMessageBig('NRP Scanning for REGULAR Modules')
+	ScanForModules( GAMEMODE.FolderName.."/gamemode/modules/" , "modules/")
+	NRP:LoadMessage('Processing REGULAR Module Que')
 	ProcessQue()
 	hook.Run('ModulesLoaded')
 end
-LoadProcess()
-PrintTable( moduleHooks )
 
 if(SERVER)then
-	util.AddNetworkString('MoRP_ReloadModules')
-	concommand.Add("MoRP_ReloadModules_SV",function()
-		MORP:LoadMessageBig(MORP.color.cyan,'MoRP Reloading Modules.')
+	util.AddNetworkString('NRP_ReloadModules')
+	concommand.Add("NRP_ReloadModules_SV",function()
+		NRP:LoadMessageBig(NRP.color.cyan,'NRP Reloading Modules.')
 		include(GAMEMODE.FolderName..'/gamemode/module_loader.lua')
 		for k,v in pairs(player.GetAll())do
-			MORP:LoadMessage("Calling load hooks on player "..v:Name() )
+			NRP:LoadMessage("Calling load hooks on player "..v:Name() )
 			v:SendLua([[
-print("Reloading MoRP.")
-MORP:LoadMessageBig(MORP.color.cyan,'MoRP Reloading Modules.')
+print("Reloading NRP.")
+NRP:LoadMessageBig(NRP.color.cyan,'NRP Reloading Modules.')
 include(GAMEMODE.FolderName..'/gamemode/module_loader.lua')
 			]])
 			hook.Call('PlayerInitialSpawn',GAMEMODE,v)
@@ -231,3 +240,6 @@ include(GAMEMODE.FolderName..'/gamemode/module_loader.lua')
 		end
 	end)
 end
+
+LoadProcess()
+PrintTable( moduleHooks )

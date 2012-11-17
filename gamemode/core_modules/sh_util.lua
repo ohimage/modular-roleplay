@@ -1,13 +1,21 @@
 --[[
-<info>
-<name>util</name>
-<author>TheLastPenguin</author>
-<desc>MISC Useful Functions</desc>
-<instance>SHARED</instance>
-</info>
+<xml>
+	<module>
+		<name>util</name>
+		<author>TheLastPenguin</author>
+		<desc>MISC Useful Functions</desc>
+		<instance>SHARED</instance>
+	</module>
+</xml>
 ]]
 
-function MORP:IP_ToNumber( str )
+local NRP = NRP
+
+-- encode IP Addresses to save data.
+function NRP:IP_ToNumber( str )
+	if( str == 'loopback' )then
+		return 0
+	end
 	local parts = string.Explode( '.', str )
 	PrintTable( parts )
 	local num = 0
@@ -16,14 +24,12 @@ function MORP:IP_ToNumber( str )
 	end
 	return num
 end
-function MORP:IP_ToString( num )
+function NRP:IP_ToString( num )
 	local parts = {}
-	while( num > 0 )do
+	while( num ~= 0 )do
 		local rem = num % 255
-		table.insert( parts, rem )
+		table.insert( parts,1, rem )
+		num = math.floor( num / 255 )
 	end
 	return table.concat( parts, '.' )
 end
-local encoded = MORP:IP_ToNumber('1.1.1.1')
-local decoded = MORP:IP_ToString( encoded )
-print( decoded )

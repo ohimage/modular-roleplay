@@ -1,4 +1,4 @@
-MORP = {} -- global table for gamemode variables.
+NRP = {} -- global table for gamemode variables.
 DeriveGamemode("sandbox")
 
 -- Checking if counterstrike is installed correctly
@@ -11,9 +11,18 @@ if table.Count(file.Find("*", "cstrike")) == 0 then
 	end)
 end
 
+/*================
+ADD CS LUA FILES
+================*/
+
 AddCSLuaFile("shared.lua")
 AddCSLuaFile("config.lua")
-AddCSLuaFile("module_loader.lua")
+AddCSLuaFile("loader_cl.lua")
+AddCSLuaFile("loader_sh.lua")
 
+/*================
+INCLUDE FILES
+================*/
 include("shared.lua") -- load shared.lua first. Only extreamly general global functions should go there.
-include("module_loader.lua")
+include("loader_sh.lua")
+include("loader_sv.lua")
