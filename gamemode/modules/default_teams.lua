@@ -50,13 +50,9 @@ for k,v in pairs( NRP.MODELS )do
 	table.insert( NRP.ALL_MODELS, v )
 end
 
-if(SERVER)then
-	NRP:AddChatCommand( 'listmodels', function( ply )
-		if( ply:IsNRPDeveloper() )then
-			PrintTable( NRP.MODELS )
-		end
-	end)
-end
+/*=============================
+DEFAULT TEAMS
+=============================*/
 
 TEAM_DEVELOPER = NRP:AddCustomTeam( 'Developer', {
 	model = NRP.ALL_MODELS,
@@ -89,18 +85,21 @@ TEAM_DEVELOPER = NRP:AddCustomTeam( 'Developer', {
 TEAM_CITIZEN = NRP:AddCustomTeam( 'Citizen', {
 	model = NRP.CITIZEN_MODELS,
 	color = Color( 0, 155, 0, 255),
-	weapons = {'weapon_physgun'},
 	vote = false,
 	command = 'citizen',
 	limit = -1
 })
+
+/*=============================
+SHADY TEAMS
+=============================*/
 
 TEAM_GANG = NRP:AddCustomTeam( 'Gangster', {
 	model = NRP.SHADY_MODELS,
 	color = Color( 155, 155, 155, 255),
 	weapons = {
 		'weapon_crowbar',
-		'weapon_smg1'
+		'weapon_pistol'
 		},
 	vote = false,
 	command = 'gangster',
@@ -108,10 +107,37 @@ TEAM_GANG = NRP:AddCustomTeam( 'Gangster', {
 })
 
 TEAM_MOBBOSS = NRP:AddCustomTeam( 'Mob Boss', {
-	model = NRP.SHADY_MODELS,
+	model = "models/gman_high.mdl",
 	color = Color( 15, 15, 15, 255),
 	vote = false,
 	command = 'mobboss',
+	limit = 1
+})
+
+/*=============================
+POLICE TEAMS
+=============================*/
+TEAM_MAYOR = NRP:AddCustomTeam( 'Mayor', {
+	model = "models/breen.mdl",
+	color = Color( 175, 0, 0, 255),
+	vote = true,
+	command = 'mayor',
+	limit = 1
+})
+
+TEAM_POLICE = NRP:AddCustomTeam( 'Police', {
+	model = "models/breen.mdl",
+	color = Color( 0, 0, 175, 255),
+	vote = true,
+	command = 'police',
+	limit = 1
+})
+
+TEAM_CHIEF = NRP:AddCustomTeam( 'Chief', {
+	model = "models/breen.mdl",
+	color = Color( 0, 55, 175, 255),
+	vote = true,
+	command = 'chief',
 	limit = 1
 })
 

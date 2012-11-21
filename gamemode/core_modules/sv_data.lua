@@ -47,7 +47,6 @@ end
 Add properties to the user database.
 ===================================*/
 NRP.DBI:AddUserProperty( 'uid', 'INT UNSIGNED', function( ply ) return tostring( ply:UniqueID() ) end ) -- user id for tracking users.
-NRP.DBI:AddUserProperty( 'ip', 'INT UNSIGNED', function( ply ) return NRP:IP_ToNumber( ply:IPAddress() ) end ) -- user id for tracking users.
 NRP.DBI:AddUserProperty( 'money', 'BIGINT UNSIGNED', NRP.cfg.StartingBalance ) -- money system.
 NRP.DBI:AddUserProperty( 'custom_name', 'VARCHAR( 30 )', function( ply ) 
 	if( string.len( ply:Name() ) > 0 )then
@@ -56,9 +55,6 @@ NRP.DBI:AddUserProperty( 'custom_name', 'VARCHAR( 30 )', function( ply )
 		return 'unknown'
 	end
 end ) -- used for custom name system.
-NRP.DBI:AddUserProperty( 'lastjob', 'INT UNSIGNED', TEAM_CITIZEN or 0) -- used for restoring old jobs on disconnect.
-NRP.DBI:AddUserProperty( 'karma', 'INT UNSIGNED', 1000) -- used for RDM system to come.
-
 /*==================================================
 Stuff to do when a player spawns for the first time.
 ==================================================*/
@@ -99,10 +95,6 @@ function GM:PlayerInitialSpawn( ply )
 			end
 		end
 		DBI:Query(string.format( "INSERT INTO prefix_users ( %s ) VALUES ( %s )", table.concat( props, ','), table.concat( vals, ',')))
-	end
-	if( not res[1] )then
-		NRP:LoadMessage( NRP.color.red, "FAILED TO LOAD USER "..ply:Name() )
-		return
 	end
 	
 	-- SQL DATA SYSTEM.

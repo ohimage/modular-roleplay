@@ -16,11 +16,13 @@ function NRP:IP_ToNumber( str )
 	if( str == 'loopback' )then
 		return 0
 	end
-	local parts = string.Explode( '.', str )
+	local parts = string.Explode( '[.:]', str )
 	PrintTable( parts )
 	local num = 0
 	for k,v in SortedPairs( parts )do
-		num = num * 255 + tonumber( v )
+		if( tonumber( v )) then
+			num = num * 255 + tonumber( v )
+		end
 	end
 	return num
 end

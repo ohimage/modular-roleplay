@@ -42,7 +42,7 @@ cfg.Curency = '$'
 -- TEAM SETTINGS
 cfg.DefaultWeapons = {
 	'weapon_physgun',
-	'weapon_gravgun',
+	'weapon_physcannon',
 	'gmod_tool'
 	}
 cfg.RunSpeed = 350
@@ -55,12 +55,6 @@ cfg.StartingBalance = 750
 
 -- CHAT
 cfg.BlockedCommands = {} -- add a command here to disable it. EX: { 'ooc', '/', 'oc' } will disable OCC chat.
-cfg.ChatFilters = {
-	['fuck'] = 'f***',
-	['gay'] = 'happy',
-	['bitch'] = 'b****',
-	['hell'] = 'heaven'
-}
 -- Data Manager - CHANGING THEASE VALUES MAY BREAK STUFF AND IS NOT ADVISED
 cfg.TablePrefix = 'NeoRP_'
-cfg.ChatRadious = 400
+cfg.ChatRadious = 250

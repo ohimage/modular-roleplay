@@ -14,6 +14,11 @@ local PLYMETA = FindMetaTable('Player')
 if(SERVER)then
 	function PLYMETA:AddMoney( amount )
 		self.SQLDATA.money = self.SQLDATA.money + amount
+		self.NETDATA.money = self.SQLDATA.money
+	end
+	function PLYMETA:SetMoney( amount )
+		self.SQLDATA.money = amount
+		self.NETDATA.money = self.SQLDATA.money
 	end
 	function PLYMETA:TakeMoney( amount )
 		self:AddMoney( -amount )
@@ -55,7 +60,9 @@ if(SERVER)then
 			return
 		elseif( not ( ply:CanAfford( amount ) ) )then
 			NRP:Notice( ply, 4, NRP:FormatString( "You can not afford to drop <cur>" .. amount .. "."), NOTIFY_ERROR )
+			return
 		end
+		ply:TakeMoney( amount )
 		NRP:CreateMoneyBag( ply:GetEyeTrace().HitPos, amount )
 	end)
 	
