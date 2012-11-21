@@ -5,7 +5,7 @@ end
 
 surface.CreateFont( "MoneyFont",{
 	font      = "Ariel",
-	size      = 24,
+	size      = 14,
 	weight    = 700
 })
 

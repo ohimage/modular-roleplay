@@ -35,6 +35,31 @@ daylight.dayspeed = CreateConVar( 'daytime_speed', '0', { FCVAR_REPLICATED , FCV
 // precache sounds.
 util.PrecacheSound( 'buttons/button1.wav' );
  
+
+local function startZombies()
+	for k,v in pairs( ents.GetAll() )do
+		if( v:GetClass() == 'npc_maker')then
+			print("FOUND A SPAWNER AND ENABLED IT.")
+			v:Fire("Enable","",1)
+		end
+	end
+	for k,v in pairs(player.GetAll())do
+		v:SendLua([[chat.AddText(Color(255,0,0),"NIGHT TIME, ZOMBIE WAVES APPROCHING")]])
+	end
+end
+local function stopZombies()
+	for k,v in pairs( ents.GetAll() )do
+		if( v:GetClass() == 'npc_maker')then
+			print("FOUND A SPAWNER AND DISABLED IT.")
+			v:Fire("Disable","",1)
+		elseif( string.find( v:GetClass(), 'npc_'))then
+			v:Ignite( 100, 100 )
+		end
+	end
+	for k,v in pairs(player.GetAll())do
+		v:SendLua([[chat.AddText(Color(255,0,0),"SUNRISE, ZOMBIES DEPARTING")]])
+	end
+end
  
 // initalize.
 function daylight:init( )
@@ -256,8 +281,12 @@ function daylight:think( )
 		// make the lights go magic!
 		if ( self.minute == DAWN ) then
 				self:lightsOff( );
+				
+				stopZombies()
 		elseif ( self.minute == DUSK ) then
 				self:lightsOn( );
+				
+				startZombies()
 		end
 end
  
