@@ -1,7 +1,7 @@
 local NRP = NRP
 if( not GAMEMODE and GM )then GAMEMODE = GM end -- make sure we have the tables we need.
 
-
+print("Loaded CL Loader")
 
 /*=================================
 LOADING MODULES

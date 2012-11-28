@@ -50,6 +50,10 @@ cfg.WalkSpeed = 250
 cfg.StrictModels = true
 cfg.RequireRespawn = true
 
+-- SHOP SETTINGS
+cfg.ShipmentSpawnTime = 3 -- set this to false to disable.
+cfg.WeaponSpawnTime = 3 -- set this to false to disable.
+
 -- ECONOMY
 cfg.StartingBalance = 750
 
