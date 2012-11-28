@@ -31,3 +31,15 @@ end
 function GM:CanProperty( ply, ent )
 	if( not ply:IsSuperAdmin() )then return false end
 end
+
+function GM:AllowPlayerPickup( player, entity)
+	if( entity.nophysgun )then
+		return false
+	end
+end
+
+function GM:CanTool()
+	if( entity.notool )then
+		return false
+	end
+end

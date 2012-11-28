@@ -20,4 +20,14 @@ if(SERVER)then
 		local trace = util.TraceLine(tracedata)
 		return trace
 	end
+	function plymeta:GetLimitedEyeTrace( dist )
+		local pos = self:GetShootPos()
+		local ang = self:GetAimVector()
+		local tracedata = {}
+		tracedata.start = pos
+		tracedata.endpos = pos+(ang*dist)
+		tracedata.filter = self.Entity
+		local trace = util.TraceLine(tracedata)
+		return trace
+	end
 end

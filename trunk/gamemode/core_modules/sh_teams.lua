@@ -20,6 +20,11 @@ function NRP:GetAllTeams( )
 	return teams
 end
 
+local plymeta = FindMetaTable("Player")
+function plymeta:TeamTbl()
+	return NRP:GetTeamByID( self:Team() )
+end
+
 local requiredValues = {
 	{'name', nil },
 	{'model', nil },
@@ -27,6 +32,7 @@ local requiredValues = {
 	{'command', nil },
 	{'color', Color(155,0,155) },
 	{'limit',nil},
+	{'salery',45}
 }
 
 -- FUNCTION FOR PLAYER CHAT COMMANDS TO CHANGE TEAMS.
@@ -81,6 +87,11 @@ function NRP:AddCustomTeam( name, tbl )
 			end
 		end)
 	end
+	
+	if( type( tbl.model ) == 'string')then
+		util.PrecacheModel( tbl.model )
+	end
+	
 	return tbl.id
 end
 
@@ -152,7 +163,10 @@ function GM:PlayerSetModel( ply )
 end
 
 function GM:PlayerInitialSpawn( ply )
-	NRP:SetPlayerTeam( ply, NRP.cfg.DefaultTeam)
+	timer.Simple(1,function()
+		NRP:SetPlayerTeam( ply, NRP.cfg.DefaultTeam)
+		hook.Call("PlayerLoadout",GAMEMODE, ply)
+	end)
 end
 
 function GM:PlayerLoadout( ply )
@@ -233,3 +247,20 @@ hook.Add("NeoRP_CanChangeTeam","ChangeFrom",function( ply, tbl )
 		return
 	end
 end)
+
+if(SERVER)then
+	local paydaytime = NRP.cfg.PayDayTimer
+	timer.Create("NeoRP_PayDay",paydaytime, 0, function()
+		for k,v in pairs( player.GetAll() )do
+			local t = v:TeamTbl()
+			if( t )then
+				if( t.salery and t.salery > 0 )then
+					v:GiveMoney( t.salery )
+					NRP:Notice( v, 4, "Pay day! You recieved $"..t.salery.."!" )
+				else
+					NRP:Notice(v, 4, "Pay day skipped. You are unemployed.",NOTIFY_ERROR)
+				end
+			end
+		end
+	end)
+end

@@ -1,6 +1,7 @@
 include("shared.lua")
 
 function ENT:Initialize()
+	NRP:ChangeModelScale( self, 0, 1, 2)
 end
 
 surface.CreateFont( "MoneyFont",{

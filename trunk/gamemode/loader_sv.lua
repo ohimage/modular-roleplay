@@ -1,11 +1,14 @@
 local NRP = NRP
 if( not GAMEMODE and GM )then GAMEMODE = GM end -- make sure we have the tables we need.
 
-
 local clModules = {}
+local clCurModules = {}
 local function AddClientModule( path, tbl )
 	AddCSLuaFile( path )
-	clModules[ path ] = table.Copy( tbl )
+	clCurModules[ path ] = table.Copy( tbl )
+end
+local function NewCLModuleSet( )
+	table.insert( clModules, clCurModules )
 end
 
 util.AddNetworkString("NeoRP_ModuleList")
@@ -93,10 +96,12 @@ function NRP:FindModules( dir )
 		local path = dir..v
 		NRP:LoadModule( path )
 	end
+	NewCLModuleSet()
 end
 
 local function load()
 	NRP:LoadMessageBig(NRP.color.white,"LOADING MODULES.")
+	NRP:FindModules( GAMEMODE.FolderName.."/gamemode/vgui/" )
 	NRP:FindModules( GAMEMODE.FolderName.."/gamemode/core_modules/" )
 	NRP:FindModules( GAMEMODE.FolderName.."/gamemode/modules/" )
 
@@ -104,9 +109,13 @@ local function load()
 end
 
 load()
+util.AddNetworkString("NeoRP_ReloadTrig")
 concommand.Add('NRP_Reload',function( ply )
 	if( ply:IsListenServerHost() )then
-		load()
+		include(GAMEMODE.FolderName.."/gamemode/loader_sh.lua")
+		include(GAMEMODE.FolderName.."/gamemode/loader_sv.lua")
+		net.Start("NeoRP_ReloadTrig")
+		net.Send( player.GetAll() )
 		for k,v in pairs( player.GetAll() )do
 			hook.Call('PlayerInitialSpawn', GAMEMODE, v )
 		end
