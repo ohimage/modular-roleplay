@@ -10,10 +10,12 @@ end
 
 util.AddNetworkString("NeoRP_ModuleList")
 local function SendModuleList( ply )
-	NRP:LoadMessageBig("Sending module list to "..ply:Name())
-	net.Start("NeoRP_ModuleList")
-		net.WriteTable( clModules )
-	net.Send( ply )
+	timer.Simple( 1, function()
+		NRP:LoadMessageBig("Sending module list to "..ply:Name())
+		net.Start("NeoRP_ModuleList")
+			net.WriteTable( clModules )
+		net.Send( ply )
+	end)
 end
 hook.Add("PlayerInitialSpawn","NeoRP_Modules", SendModuleList )
 
