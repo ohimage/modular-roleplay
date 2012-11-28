@@ -11,10 +11,10 @@
 ]]
 
 local shipments = {}
-local ammoTypes = {}
+local entities = {}
 
 NRP.shipments = shipments
-NRP.ammoTypes = ammoTypes
+NRP.customEnts = entities
 
 /*===================================
 List of required values on shipments:
@@ -52,34 +52,6 @@ function NRP:AddCustomShipment( name, tbl )
 	tbl.id = #shipments + 1
 	shipments[ tbl.id ] = tbl
 end
-
-local ammoReqVals = {
-	{'name', nil },
-	{'iconmodel', nil },
-	{'type', nil },
-	{'quantity', 10 },
-	{'price', nil }
-}
-function NRP:ShopAddAmmoType( name, tbl )
-	if( type( name ) == 'table' )then tbl = name end
-	if( not tbl.name )then tbl.name = name end
-	NRP:LoadMessage(NRP.color.white, "Loading Ammo Type ".. tbl.name )
-	for k,v in pairs( ammoReqVals )do
-		if( not tbl[ v[1] ] )then
-			if( v[2] == nil )then
-				NRP:MsgC( NRP.color.red, "AMMO TYPE ERROR: MISSING REQUIRED PROPERTY "..v[1].. " IN TEAM "..name )
-				ErrorNoHalt("Team Error.")
-				return
-			else
-				NRP:MsgC( NRP.color.orange, "Set Property "..v[1].." to default "..tostring( v[2]))
-				tbl[ v[1] ] = v[2] 
-			end
-		end
-	end
-	tbl.id = #ammoTypes + 1
-	ammoTypes[ tbl.id ] = tbl
-end
-
 /*=====================================
 BUYING SHIPMENTS
 =====================================*/
@@ -99,14 +71,29 @@ if(SERVER)then
 		end
 		local curShip = shipments[ id ]
 		local cost = curShip.price * count
-		if( not ply:CanAfford( cost ) )then
+		if( not ply:CanAfford( cost ) )then -- make sure the player can afford the price.
 			NRP:Notice( ply, 4, 'You cant afford this shipment!', NOTIFY_ERROR )
 		end
 		
+		-- call hook to allow developers to modify the buy checks.
+		local canbuy = hook.Call("NeoRP_CanBuyShipment",GAMEMODE, ply, curShip, arg )
+		if( not( canbuy == true or canbuy == nil ) )then
+			if( type( canbuy ) == 'string') then
+				NRP:Notice( ply, 4, canbuy, NOTIFY_ERROR )
+			else
+				NRP:Notice( ply, 4, "You cant buy this shipment.", NOTIFY_ERROR )
+			end
+			return
+		end
+					
+		
+		ply:TakeMoney( cost )
+		
 		NRP:Notice( ply, 4, 'You bought a shipment of '.. curShip.name .. ' for '.. ( cost ) ) 
 		
+		
 		local e = ents.Create("shipment")
-		e:SetPos( ply:GetEyeTrace().HitPos)
+		e:SetPos( ply:GetLimitedEyeTrace( 100 ).HitPos )
 		e.dt.item = id
 		e.dt.owner = ply
 		e.dt.count = count
@@ -116,20 +103,35 @@ if(SERVER)then
 		e:Spawn()
 		e:Activate()
 	end)
+	
+	hook.Add("NeoRP_CanBuyShipment","TeamCheck",function(ply, ship, arg)
+		if( ship.teams )then
+			if( type( ship.teams ) == 'table' )then
+				if( not table.HasValue( ship.teams, ply:Team() ) )then
+					return "You arn't the right team to buy this!"
+				end
+			elseif( type( ship.teams ) == 'number' )then
+				if( ship.teams ~= ply:Team() )then
+					return "You arnt the right team to buy this!"
+				end
+			end
+		end
+	end)
 elseif( CLIENT )then
 	
 end
 /*
  TEST SHIPMENT
 */
-NRP:AddCustomShipment('Saw Blades',{
-	model = 'models/props_junk/sawblade001a.mdl',
+NRP:AddCustomShipment('HL2 Pistol',{
+	model = 'models/weapons/w_pistol.mdl',
 	class = 'weapon_pistol',
 	price = 100
 })
 
-NRP:AddCustomShipment('Heli Bombs',{
-	model = 'models/Combine_Helicopter/helicopter_bomb01.mdl',
+NRP:AddCustomShipment('HL2 SMG',{
+	model = 'models/weapons/w_smg1.mdl',
 	class = 'weapon_smg1',
-	price = 100
+	price = 100,
+	teams = {TEAM_DEVELOPER}
 })

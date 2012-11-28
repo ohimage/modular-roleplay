@@ -40,6 +40,7 @@ NRP.color.white = Color(255,255,255)
 cfg.Curency = '$'
 
 -- TEAM SETTINGS
+cfg.PayDayTimer = 30
 cfg.DefaultWeapons = {
 	'weapon_physgun',
 	'weapon_physcannon',

@@ -13,11 +13,14 @@ function ENT:Initialize()
 	self.nodupe = true
 	self.ShareGravgun = true
 	phys:Wake()
+	
+	-- NeoRP player protection
+	self.notool = true
+	self.nophysgun = true
+	self.nospawn = true
 end
-AV-9240-8Klj)($_(0213980fkj3
 
 function ENT:Use(activator,caller)
-	-- i borrowed this code from DarkRP since I'm really not that good with entities.
 	if self.PlayerUse == false then return end
 	local class = self.itemtbl.class
 	NRP:Notice(activator, 4, "Picked up "..self.itemtbl.name.."!")

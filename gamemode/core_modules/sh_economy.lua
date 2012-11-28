@@ -16,6 +16,9 @@ if(SERVER)then
 		self.SQLDATA.money = self.SQLDATA.money + amount
 		self.NETDATA.money = self.SQLDATA.money
 	end
+	function PLYMETA:GiveMoney( amount ) -- just some people prefer this name.
+		self:AddMoney( amount )
+	end
 	function PLYMETA:SetMoney( amount )
 		self.SQLDATA.money = amount
 		self.NETDATA.money = self.SQLDATA.money
@@ -63,7 +66,7 @@ if(SERVER)then
 			return
 		end
 		ply:TakeMoney( amount )
-		NRP:CreateMoneyBag( ply:GetEyeTrace().HitPos, amount )
+		NRP:CreateMoneyBag( ply:GetLimitedEyeTrace( 100 ).HitPos, amount )
 	end)
 	
 	-- give someone some money.

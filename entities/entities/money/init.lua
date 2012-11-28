@@ -14,6 +14,11 @@ function ENT:Initialize()
 	self.nodupe = true
 	self.ShareGravgun = true
 	phys:Wake()
+	
+	-- NeoRP player protection
+	self.notool = true
+	self.nophysgun = true
+	self.nospawn = true
 end
 
 

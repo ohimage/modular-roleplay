@@ -7,4 +7,5 @@ ENT.AdminSpawnable = false
 
 function ENT:SetupDataTables()
 	self:DTVar("Int",0,"item")
+	self:DTVar("Int",1,"count")
 end
