@@ -26,3 +26,8 @@ INCLUDE FILES
 include("shared.lua") -- load shared.lua first. Only extreamly general global functions should go there.
 include("loader_sh.lua")
 include("loader_sv.lua")
+
+/*===============
+RESOURCES
+===============*/
+resource.AddFile( "materials/neorp/neorp_gwen.png")

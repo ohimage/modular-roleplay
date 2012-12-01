@@ -13,8 +13,8 @@ net.Receive("NeoRP_ModuleList",function()
 		for k,v in pairs( m )do
 			NRP:QueModule( k, v )
 		end
+		NRP:LoadQue()
 	end
-	NRP:LoadQue()
 end)
 
 net.Receive("NeoRP_ReloadTrig",function()

@@ -9,6 +9,7 @@ local function AddClientModule( path, tbl )
 end
 local function NewCLModuleSet( )
 	table.insert( clModules, clCurModules )
+	clCurModules = {}
 end
 
 util.AddNetworkString("NeoRP_ModuleList")
@@ -97,6 +98,7 @@ function NRP:FindModules( dir )
 		NRP:LoadModule( path )
 	end
 	NewCLModuleSet()
+	NRP:LoadQue()
 end
 
 local function load()
@@ -104,14 +106,12 @@ local function load()
 	NRP:FindModules( GAMEMODE.FolderName.."/gamemode/vgui/" )
 	NRP:FindModules( GAMEMODE.FolderName.."/gamemode/core_modules/" )
 	NRP:FindModules( GAMEMODE.FolderName.."/gamemode/modules/" )
-
-	NRP:LoadQue()
 end
 
 load()
 util.AddNetworkString("NeoRP_ReloadTrig")
 concommand.Add('NRP_Reload',function( ply )
-	if( ply:IsListenServerHost() )then
+	if( not IsValid( ply ) or ply:IsListenServerHost() )then
 		include(GAMEMODE.FolderName.."/gamemode/loader_sh.lua")
 		include(GAMEMODE.FolderName.."/gamemode/loader_sv.lua")
 		net.Start("NeoRP_ReloadTrig")

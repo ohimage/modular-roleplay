@@ -18,6 +18,7 @@ function ENT:Initialize()
 	self.notool = true
 	self.nophysgun = true
 	self.nospawn = true
+	self:DropToFloor( )
 end
 
 function ENT:Use(activator,caller)

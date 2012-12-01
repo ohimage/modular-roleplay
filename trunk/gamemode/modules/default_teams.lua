@@ -93,6 +93,7 @@ TEAM_CITIZEN = NRP:AddCustomTeam( 'Citizen', {
 /*=============================
 SHADY TEAMS
 =============================*/
+GROUP_UNDERWORLD = NRP:AddTeamGroup("Under World", { } )
 
 TEAM_GANG = NRP:AddCustomTeam( 'Gangster', {
 	model = NRP.SHADY_MODELS,
@@ -103,7 +104,8 @@ TEAM_GANG = NRP:AddCustomTeam( 'Gangster', {
 		},
 	vote = false,
 	command = 'gangster',
-	limit = 6
+	limit = 6,
+	group = GROUP_UNDERWORLD
 })
 
 TEAM_MOBBOSS = NRP:AddCustomTeam( 'Mob Boss', {
@@ -111,18 +113,22 @@ TEAM_MOBBOSS = NRP:AddCustomTeam( 'Mob Boss', {
 	color = Color( 15, 15, 15, 255),
 	vote = false,
 	command = 'mobboss',
-	limit = 1
+	limit = 1,
+	group = GROUP_UNDERWORLD
 })
 
 /*=============================
 POLICE TEAMS
 =============================*/
+GROUP_POLICE = NRP:AddTeamGroup("Police", { } )
+
 TEAM_MAYOR = NRP:AddCustomTeam( 'Mayor', {
 	model = "models/breen.mdl",
 	color = Color( 175, 0, 0, 255),
 	vote = true,
 	command = 'mayor',
-	limit = 1
+	limit = 1,
+	group = GROUP_POLICE
 })
 
 TEAM_POLICE = NRP:AddCustomTeam( 'Police', {
@@ -130,7 +136,8 @@ TEAM_POLICE = NRP:AddCustomTeam( 'Police', {
 	color = Color( 0, 0, 175, 255),
 	vote = true,
 	command = 'police',
-	limit = 1
+	limit = 1,
+	group = GROUP_POLICE
 })
 
 TEAM_CHIEF = NRP:AddCustomTeam( 'Chief', {
@@ -138,7 +145,8 @@ TEAM_CHIEF = NRP:AddCustomTeam( 'Chief', {
 	color = Color( 0, 55, 175, 255),
 	vote = true,
 	command = 'chief',
-	limit = 1
+	limit = 1,
+	group = GROUP_POLICE
 })
 
 

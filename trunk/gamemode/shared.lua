@@ -98,7 +98,8 @@ end
 /*=========================
 SMEXY LOOKING LOAD MESSAGES
 =========================*/
-function NRP:LoadMessage( ... )
+local lastbig = 0
+local function LoadMessage( ... )
 	local msg = {...}
 	local msgLen = 0
 	for k,v in pairs( msg )do
@@ -106,10 +107,17 @@ function NRP:LoadMessage( ... )
 			msgLen = msgLen + string.len( v )
 		end
 	end
+	if( msgLen <= 1 )then return end
 	NRP:DebugMsgRAW(instanceColor,'| ')
 	NRP:DebugMsgRAW(...)
 	NRP:DebugMsgRAW(string.format('%'..math.max(76 - msgLen,1)..'s', ''),instanceColor,' |\n' )
 end
+
+function NRP:LoadMessage(...)
+	lastbig = 0
+	LoadMessage( ... )
+end
+
 function NRP:LoadMessageBig( ... )
 	local msg = {...}
 	local msgLen = 0
@@ -119,8 +127,11 @@ function NRP:LoadMessageBig( ... )
 		end
 	end
 	NRP:DebugMsgRAW(instanceColor,'================================================================================\n')
-	NRP:LoadMessage( ... )
-	NRP:DebugMsgRAW(instanceColor,'================================================================================\n')
+	LoadMessage( ... )
+	if( RealTime() ~= lastbig) then
+		NRP:DebugMsgRAW(instanceColor,'================================================================================\n')
+	end
+	lastbig = RealTime()
 end
 function NRP:LoadErrorMessage( ... )
 	NRP:LoadMessage( NRP.color.red,'    [ERROR]', ... )

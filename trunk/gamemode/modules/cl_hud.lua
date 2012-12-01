@@ -24,6 +24,21 @@ NameTab = {{ },{ },{ },{ }} --create the two dimensional table
 /*==========================================
 DRAWING CODE
 ==========================================*/
+surface.CreateFont( "LPSHUD18",
+	{
+		font      = "coolvetica",
+		size      = 20,
+		weight    = 100
+	}
+ )
+surface.CreateFont( "LPSHUD20",
+	{
+		font      = "coolvetica",
+		size      = 22,
+		weight    = 100
+	}
+ )
+
 local GRADIENT_UP = Material("vgui/gradient_up")
 local BACK_COLOR = Color( 75, 75, 75 )
 
@@ -63,7 +78,7 @@ local function PaintName()
 	surface.DrawPoly( NameTab )
 	
 	// Player Name
-	draw.DrawText(  "Name: "..LocalPlayer():Name(),  "Trebuchet18",  15,  hudY - 25,  Color(255,255,255,255), TEXT_ALIGN_LEFT )
+	draw.DrawText(  "Name: "..LocalPlayer():Name(),  "LPSHUD18",  15,  hudY - 25,  Color(255,255,255,255), TEXT_ALIGN_LEFT )
 end
 
 /*====================================
@@ -114,21 +129,21 @@ end
 // CUSTOM HUD PROPERTIES:
 -- JOB
 NRP_AddHUDProperty( 200, function(x, y, w, h)
-	draw.DrawText(  "Job: "..team.GetName( LocalPlayer():Team() ) ,  "Trebuchet20",  x + w / 2,  y + 2.5,  Color(255, 255, 255, 255),  TEXT_ALIGN_CENTER )
+	draw.DrawText(  "Job: "..team.GetName( LocalPlayer():Team() ) ,  "LPSHUD20",  x + w / 2,  y + 2.5,  Color(255, 255, 255, 255),  TEXT_ALIGN_CENTER )
 end)
 
 -- Health
 NRP_AddHUDProperty( 200, function(x, y, w, h)
 	surface.SetDrawColor( 255, 0, 0, 255 )
 	surface.DrawRect( x, y, math.Min( LocalPlayer():Health(), 100 ) / 100 * w , h )
-	draw.DrawText(  "Health: "..LocalPlayer():Health(),  "Trebuchet20",  x + w / 2,  y + 2.5,  Color(255, 255, 255, 255),  TEXT_ALIGN_CENTER )
+	draw.DrawText(  "Health: "..LocalPlayer():Health(),  "LPSHUD20",  x + w / 2,  y + 2.5,  Color(255, 255, 255, 255),  TEXT_ALIGN_CENTER )
 end)
 
 -- Armor
 NRP_AddHUDProperty( 200, function(x, y, w, h)
 	surface.SetDrawColor( 255, 0, 0, 255 )
 	surface.DrawRect( x, y, math.Min( LocalPlayer():Armor(), 100 ) / 100 * w , h )
-	draw.DrawText(  "Armor: "..LocalPlayer():Armor(),  "Trebuchet20",  x + w / 2,  y + 2.5,  Color(255, 255, 255, 255),  TEXT_ALIGN_CENTER )
+	draw.DrawText(  "Armor: "..LocalPlayer():Armor(),  "LPSHUD20",  x + w / 2,  y + 2.5,  Color(255, 255, 255, 255),  TEXT_ALIGN_CENTER )
 end)
 
 -- Money
@@ -137,7 +152,7 @@ NRP_AddHUDProperty( 200, function(x, y, w, h)
 	local outOf = math.pow( 10, (math.floor( math.log10( money ) ) + 1 ))
 	surface.SetDrawColor( 0, 155, 0, 255 )
 	surface.DrawRect( x, y, ( money / outOf ) * w , h ) 
-	draw.DrawText(  "Wallet: $"..money,  "Trebuchet20",  x + w / 2,  y + 2.5,  Color(255, 255, 255, 255),  TEXT_ALIGN_CENTER )
+	draw.DrawText(  "Wallet: $"..money,  "LPSHUD20",  x + w / 2,  y + 2.5,  Color(255, 255, 255, 255),  TEXT_ALIGN_CENTER )
 end)
 
 -- Bullets
@@ -160,7 +175,7 @@ NRP_AddHUDProperty( 200, function(x, y, w, h)
 			col = Color( 255, 0, 0, 255 )
 		end
 	end
-	draw.DrawText( text ,  "Trebuchet20",  x + w / 2,  y + 2.5, col ,  TEXT_ALIGN_CENTER )
+	draw.DrawText( text ,  "LPSHUD20",  x + w / 2,  y + 2.5, col ,  TEXT_ALIGN_CENTER )
 end, function()
 	local w = LocalPlayer():GetActiveWeapon()
 	if( not( w and IsValid( w ) and w.Clip1 ))then return false end
