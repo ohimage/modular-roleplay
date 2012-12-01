@@ -1,6 +1,6 @@
 ENT.Type = "anim"
-ENT.Base = "base_gmodentity"
-ENT.PrintName = "NeoRP Shipment"
+ENT.Base = "base_outlined"
+ENT.PrintName = "NeoRP Weapon"
 ENT.Author = "TheLastPenguin"
 ENT.Spawnable = false
 ENT.AdminSpawnable = false

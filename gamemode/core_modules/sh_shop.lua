@@ -130,8 +130,7 @@ NRP:AddCustomShipment('HL2 Pistol',{
 })
 
 NRP:AddCustomShipment('HL2 SMG',{
-	model = 'models/weapons/w_smg1.mdl',
+	model = 'models/weapons/w_mach_m249para.mdl',
 	class = 'weapon_smg1',
-	price = 100,
-	teams = {TEAM_DEVELOPER}
+	price = 100
 })

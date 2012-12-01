@@ -136,10 +136,10 @@ local function QueHasModule( name )
 	return que[ name ] or false
 end
 
+local loaded = {}
 function NRP:LoadQue( )
 	NRP:LoadMessageBig("PROCESSING MODULE QUE.")
 	--PrintTable( que )
-	local loaded = {}
 	
 	-- remove requirements for nonexistant modules.
 	NRP:LoadMessageBig("Checking requirements.")
@@ -152,7 +152,7 @@ function NRP:LoadQue( )
 				elseif( CLIENT and string.find( r, 'sv_' ) )then
 					NRP:LoadMessage(NRP.color.white,'     MODULE '..k..' Removed sv require on client '..r..'.' )
 					v.s.require[ _ ] = nil
-				elseif( not QueHasModule( r ) )then
+				elseif( not QueHasModule( r ) and not table.HasValue( loaded, r ) )then
 					NRP:LoadMessage(NRP.color.red,'     MODULE '.. k..' Removed requirement '..r..' INVALID.' )
 					v.s.require[ _ ] = nil
 				else
@@ -216,6 +216,8 @@ function NRP:LoadQue( )
 		NRP:LoadMessage(NRP.color.white,"     Compiled hook: "..k)
 		mhook.Compile( k )
 	end
+	
+	que = {}
 end
 
 function NRP:RunModule( path, moduleTBL)

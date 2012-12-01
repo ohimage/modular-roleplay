@@ -11,6 +11,7 @@
 ]]
 
 local teams = {}
+local groups = {}
 local teamPlayers = {} -- table of who's on what teams.
 
 function NRP:GetTeamByID( teamid )
@@ -18,6 +19,9 @@ function NRP:GetTeamByID( teamid )
 end
 function NRP:GetAllTeams( )
 	return teams
+end
+function NRP:GetAllGroups()
+	return groups
 end
 
 local plymeta = FindMetaTable("Player")
@@ -60,16 +64,16 @@ HOOK_<name> - hooks coming soon
 ]]
 
 function NRP:AddCustomTeam( name, tbl )
-	NRP:MsgC(NRP.color.white,"Registered team "..name )
 	tbl['name'] = name
+	NRP:LoadMessage(NRP.color.white,"Registered team ", tbl.color or NRP.color.red, name )
 	for k,v in pairs( requiredValues )do
 		if( tbl[ v[1] ] == nil )then
 			if( v[2] == nil )then
-				NRP:MsgC( NRP.color.red, "TEAM ERROR: MISSING REQUIRED PROPERTY "..v[1].. " IN TEAM "..name )
+				NRP:LoadMessage( NRP.color.red, "TEAM ERROR: MISSING REQUIRED PROPERTY "..v[1].. " IN TEAM "..name )
 				ErrorNoHalt("Team Error.")
 				return
 			else
-				NRP:MsgC( NRP.color.orange, "Set Property "..v[1].." to default "..tostring( v[2]))
+				NRP:LoadMessage( NRP.color.grey, "Set Property "..v[1].." to default "..tostring( v[2]))
 				tbl[ v[1] ] = v[2] 
 			end
 		end
@@ -92,6 +96,14 @@ function NRP:AddCustomTeam( name, tbl )
 		util.PrecacheModel( tbl.model )
 	end
 	
+	return tbl.id
+end
+
+function NRP:AddTeamGroup( name, tbl )
+	NRP:LoadMessage(NRP.color.white,"Registered team group ", name )
+	tbl.name = name
+	tbl.id = #groups + 1
+	groups[ #groups + 1 ] = tbl
 	return tbl.id
 end
 

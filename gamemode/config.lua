@@ -30,7 +30,7 @@ NRP.color.blue = Color(0,0,255)
 NRP.color.cyan = Color(0,255,255)
 NRP.color.black = Color(0,0,0)
 NRP.color.grey = Color(155,155,155)
-NRP.color.white = Color(255,255,255)
+NRP.color.white = Color(255,255,255,255)
 
 /*==========================
 | MODULE SPECIFIC SETTINGS |
