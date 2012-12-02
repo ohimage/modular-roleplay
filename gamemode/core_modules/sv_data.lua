@@ -100,6 +100,9 @@ function GM:PlayerInitialSpawn( ply )
 	-- SQL DATA SYSTEM.
 	local data = res[1]
 	
+	if( not data )then 
+		print("FAILED TO LOAD USER "..ply:Name() )
+		return end
 	-- if the data looks like a number... it probably is one... so make it one.
 	for k,v in pairs( data )do
 		if( string.match( v, '[0-9]*') == v )then
@@ -126,7 +129,7 @@ Initialise Database Tables and other stuff...
 function DBI:Init()
 	-- list of default tables to check for / create if they dont exist.
 	local tables = {
-		"prefix_users ( uid INT UNSIGNED NOT NULL )",
+		"prefix_users ( uid INT UNSIGNED NOT NULL, UNIQUE (uid) )",
 		"prefix_doors ( map VARCHAR( 200 ), id BIGINT NOT NULL, locked TINYINT, title VARCHAR(30), price SMALLINT )",
 		"prefix_weapons ( uid INT NOT NULL, class VARCHAR( 30 ), ammo1 SMALLINT UNSIGNED, ammo2 SMALLINT UNSIGNED, expires INT)"
 	}

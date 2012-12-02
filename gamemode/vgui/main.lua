@@ -3,44 +3,31 @@
 	<module>
 		<name>mainmenu</name>
 		<author>TheLastPenguin</author>
-		<desc>Client side sexyness</desc>
-		<instance>CLIENT</instance>
+		<desc>Menu system and some of it's serverside parts.</desc>
+		<instance>SHARED</instance>
 	</module>
 </xml>
 ]]
-local w = 0
-local h = 0
-local menu = nil
-local function ClientMenu()
-	w, h = ScrW(), ScrH() 
-	if( not menu or not ValidPanel( menu ) )then
-		print("Making a new menu.")
-		menu = vgui.Create("NRP_Frame")
-		menu:SetSize( w / 2, h / 2 )
-		menu:SetPos( w / 4, h / 4 )
-		menu:SetDeleteOnClose( false )
-		menu.OnClose = function( panel )
-			menu:SetVisible( true )
-			print("Menu close!")
-			menu:MoveTo( w / 4, h, 0.5, 0, 1, nil )
-			timer.Simple(0.5,function()
-				menu:SetVisible( false )
-			end)
-			return true
+
+if(CLIENT)then
+	local function ClientMenu()
+		if( not NRP.mainmenu or not ValidPanel( NRP.mainmenu ) )then
+			NRP:MakeMainMenu()
 		end
-		menu:SetVisible( false )
-	end
-	if( ValidPanel( menu ) )then
-		if( menu:IsVisible()) then
-			menu.OnClose( menu )
-			return
+		if( ValidPanel( NRP.mainmenu ) )then
+			if( NRP.mainmenu:IsVisible()) then
+				NRP.mainmenu:OnClose( )
+				return
+			end
+			print("Showing menu!")
+			NRP.mainmenu:MoveTo( ScrW() / 4, ScrH() / 4, 0.5, 0, 1, nil )
+			NRP.mainmenu:SetVisible( true )
+			NRP.mainmenu:MakePopup()
 		end
-		print("Showing menu!")
-		menu:MoveTo( w / 4, h / 4, 0.5, 0, 1, nil )
-		menu:SetVisible( true )
-		menu:MakePopup()
+		NRP:UpdateMenuTabs( )
+		hook.Call("NeoRP_MenuOpened",GAMEMODE, menu )
 	end
+	concommand.Add("NRP_Menu",function( ply, cmd, args )
+		ClientMenu()
+	end)
 end
-concommand.Add("NeoRP_OpenMenu",function()
-	ClientMenu()
-end)

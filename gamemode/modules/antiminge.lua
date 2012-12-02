@@ -25,9 +25,18 @@ function GM:EntityTakeDamage( target, dmginfo )
 	end
 end
 function GM:CanDrive( ply, ent ) -- disable prop driving.
-    if ( not ply:IsSuperAdmin() ) then return false end
+    if ( not ply:IsSuperAdmin() ) then
+		ply:ChatPrint("You must be a superadmin to do this!")
+		return false end
 end
 
 function GM:CanProperty( ply, ent )
-	if( not ply:IsSuperAdmin() )then return false end
+	if( not ply:IsSuperAdmin() )then
+		ply:ChatPrint("You must be a superadmin to do this!")
+		return false end
+end
+
+function GM:PlayerSpawnSWEP( ply, class, wep )
+	ply:ChatPrint("This functionality is diabled.")
+	return false;
 end

@@ -10,6 +10,9 @@ function ENT:Initialize()
 	self.modelent:SetNoDraw( true )
 	self.modelent:SetPos( self:GetPos() + self:GetAngles():Up() * ( self:OBBMaxs().z + 20) )
 	self.modelent:SetAngles( self:GetAngles() )
+	NRP:ChangeModelScale( self.modelent, 0, 1, spawnTime)
+	
+	self.spawning = nil
 end
 
 surface.CreateFont( "ShipmentFont",{
@@ -20,22 +23,56 @@ surface.CreateFont( "ShipmentFont",{
 	antialias = false
 })
 
+local matBallGlow = Material("models/props_combine/tpballglow")
+function ENT:DrawWeaponPreview()
+	local modelent = self.modelent
+	local obbmaxs = self:OBBMaxs()
+	local OBBCLModel = modelent:OBBMaxs()
+	
+	-- position calculations are always the same.
+	local ang = self:GetAngles()
+	ang:RotateAroundAxis( self:GetAngles():Up(), CurTime() * 70 )
+	local entpos = self:GetPos() + self:GetAngles():Up() * ( obbmaxs.z + 10 + math.cos( CurTime() * 3 ) * 5)
+	modelent:SetPos( entpos )
+	modelent:SetAngles( ang )
+		
+	if( self.spawning ~= nil)then
+		local colr = 1 - ((CurTime() - self.spawning) / spawnTime)
+		local colg = (CurTime() - self.spawning) / spawnTime
+		
+		render.MaterialOverride(matBallGlow)
+		render.SetColorModulation(colr, colg, 0)
+		modelent:DrawModel()
+		render.MaterialOverride()
+		render.SetColorModulation(1, 1, 1)
+		render.MaterialOverride()
+
+		local normal = - modelent:GetAngles():Up()
+		local height = modelent:OBBMaxs().z * ((CurTime() - self.spawning) / spawnTime)
+		local pos = modelent:LocalToWorld(Vector(0, 0, modelent:GetPos().z ))
+		local distance = normal:Dot(pos)
+		render.EnableClipping(true)
+		render.PushCustomClipPlane(normal, distance);
+		modelent:DrawModel()
+		render.PopCustomClipPlane()
+		
+		if( CurTime() - self.spawning > spawnTime )then
+			self.spawning = nil
+		end
+	else
+		modelent:DrawModel()
+	end
+end
+
 function ENT:Draw()
 	self:DrawModel()
+	self:DrawWeaponPreview()
+	
 	
 	local obbmaxs = self:OBBMaxs()
-	
-	if(self.modelent)then
-		local ang = self:GetAngles()
-		ang:RotateAroundAxis( self:GetAngles():Up(), RealTime() * 70 ) 
-		self.modelent:SetPos( self:GetPos() + self:GetAngles():Up() * ( obbmaxs.z + 20) - ang:Forward() * ( self.modelent:OBBMaxs().x ) )
-		self.modelent:SetAngles( ang )
-		self.modelent:DrawModel()
-	end
-	
 	local pos = self:GetPos()
 	local angle = self:GetAngles()
-
+	
 	surface.SetFont("ShipmentFont")
 	local width1 = surface.GetTextSize( self.itemname or "<unknown>")
 	
@@ -52,3 +89,9 @@ function ENT:OnRemove()
 	self.modelent:Remove()
 	print("Removed clientside gun icon.")
 end
+
+net.Receive("NeoRP_ShipSpawning",function()
+	print("RECIEVED SPAWNING FLAG!")
+	local s = net.ReadEntity( )
+	s.spawning = CurTime()
+end)
