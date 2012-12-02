@@ -15,6 +15,28 @@ net.Receive("NeoRP_ModuleList",function()
 		end
 		NRP:LoadQue()
 	end
+	
+	hook.Remove("HUDPaint","NRP_Pending")
+	timer.Remove("UpdateLoadStr")
+end)
+
+surface.CreateFont( "NRP_Loading",{
+	font      = "coolvetica",
+	size      = 120,
+	weight    = 1000
+})
+local loadstr = ''
+timer.Create("UpdateLoadStr",0.5,0,function()
+	loadstr = loadstr .. '.'
+	if( string.len( loadstr ) > 3 )then
+		loadstr = ''
+	end
+end)
+hook.Add("HUDPaint","NRP_Pending",function()
+	surface.SetDrawColor( Color( 155, 155, 155 ) )
+	surface.DrawRect( 0, 0, ScrW(), ScrH() )
+	draw.SimpleText("NeoRP Loading"..loadstr , "NRP_Loading", ScrW() / 2, ScrH() / 2, Color( 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+	return true
 end)
 
 net.Receive("NeoRP_ReloadTrig",function()

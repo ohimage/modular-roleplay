@@ -17,8 +17,6 @@ end
 local matWireframe = Material("models/wireframe")
 local matWhite = Material("models/debug/debugwhite")
 function ENT:DrawTranslucent()
-	print("COOL BEEZ!")
-	
 	local time = (CurTime() * 1.5 + self.Seed) % 2
 
 	self:DrawModel()

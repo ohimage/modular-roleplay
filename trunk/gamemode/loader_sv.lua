@@ -101,14 +101,11 @@ function NRP:FindModules( dir )
 	NRP:LoadQue()
 end
 
-local function load()
-	NRP:LoadMessageBig(NRP.color.white,"LOADING MODULES.")
-	NRP:FindModules( GAMEMODE.FolderName.."/gamemode/vgui/" )
-	NRP:FindModules( GAMEMODE.FolderName.."/gamemode/core_modules/" )
-	NRP:FindModules( GAMEMODE.FolderName.."/gamemode/modules/" )
-end
+NRP:LoadMessageBig(NRP.color.white,"LOADING MODULES.")
+NRP:FindModules( GAMEMODE.FolderName.."/gamemode/vgui/" )
+NRP:FindModules( GAMEMODE.FolderName.."/gamemode/core_modules/" )
+NRP:FindModules( GAMEMODE.FolderName.."/gamemode/modules/" )
 
-load()
 util.AddNetworkString("NeoRP_ReloadTrig")
 concommand.Add('NRP_Reload',function( ply )
 	if( not IsValid( ply ) or ply:IsListenServerHost() )then
