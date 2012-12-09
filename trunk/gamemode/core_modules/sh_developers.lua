@@ -28,7 +28,7 @@ if(SERVER)then
 	function GM:PlayerInitialSpawn( ply )
 		local isDev, role = ply:IsNRPDeveloper()
 		if( isDev )then
-			NRP:ChatMessage( player.GetAll(), NRP.color.cyan, 'NRP ', NRP.color.orange, role, ', '..ply:Name(), NRP.color.cyan," joined the game. Make sure to thank him for helping make this incredible gamemode.")
+			NRP.ChatMessage( player.GetAll(), NRP.color.cyan, 'NRP ', NRP.color.orange, role, ', '..ply:Name(), NRP.color.cyan," joined the game. Make sure to thank him for helping make this incredible gamemode.")
 		end
 	end
 end

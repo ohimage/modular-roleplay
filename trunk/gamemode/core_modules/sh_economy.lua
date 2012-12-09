@@ -39,9 +39,9 @@ if(SERVER)then
 		end
 	end
 	
-	function NRP:CreateMoneyBag(pos, amount)
+	NRP.CreateMoneyBag = function(pos, amount)
 		local e = ents.Create("money")
-		e:SetPos(pos)
+		e:SetPos( pos )
 		e.dt.amount = amount
 		e:Spawn()
 		e:Activate()
@@ -49,53 +49,55 @@ if(SERVER)then
 	end
 	
 	-- drop some money.
-	NRP:AddChatCommand('dropmoney',function( ply, amount )
+	NRP.AddChatCommand('dropmoney',function( ply, amount )
 		if( not amount )then
-			NRP:Notice( ply, 4, 'You must specify how much money to drop. EX: /dropmoney 100', NOTIFY_ERROR )
+			NRP.Notice( ply, 4, 'You must specify how much money to drop. EX: /dropmoney 100', NOTIFY_ERROR )
 			return
 		elseif( string.match( amount, '[0-9]*') ~= amount )then
-			NRP:Notice( ply, 4, 'Amount must be a number. '.. string.match( amount, '[0-9]*'), NOTIFY_ERROR )
+			NRP.Notice( ply, 4, 'Amount must be a number. '.. string.match( amount, '[0-9]*'), NOTIFY_ERROR )
 			return
 		end
 		local amount = tonumber( amount )
 		if( amount <= 2 )then
-			NRP:Notice( ply, 4, 'Amount must be greater than or equal to 2')
+			NRP.Notice( ply, 4, 'Amount must be greater than or equal to 2')
 			return
 		elseif( not ( ply:CanAfford( amount ) ) )then
-			NRP:Notice( ply, 4, NRP:FormatString( "You can not afford to drop <cur>" .. amount .. "."), NOTIFY_ERROR )
+			NRP.Notice( ply, 4, NRP:FormatString( "You can not afford to drop <cur>" .. amount .. "."), NOTIFY_ERROR )
 			return
 		end
 		ply:TakeMoney( amount )
-		NRP:CreateMoneyBag( ply:GetLimitedEyeTrace( 100 ).HitPos, amount )
+		NRP.CreateMoneyBag( ply:GetLimitedEyeTrace( 100 ).HitPos, amount )
 	end)
 	
 	-- give someone some money.
-	NRP:AddChatCommand('give',function( ply, amount )
+	NRP.AddChatCommand('give',function( ply, amount )
 		if( not amount )then
-			NRP:Notice( ply, 4, 'You must specify how much money to drop. EX: /dropmoney 100', NOTIFY_ERROR )
+			NRP.Notice( ply, 4, 'You must specify how much money to drop. EX: /dropmoney 100', NOTIFY_ERROR )
 			return
 		elseif( string.match( amount, '[0-9]*') ~= amount )then
-			NRP:Notice( ply, 4, 'Amount must be a number.', NOTIFY_ERROR )
+			NRP.Notice( ply, 4, 'Amount must be a number.', NOTIFY_ERROR )
 			return
 		elseif( tonumber( amount ) <= 2 )then
-			NRP:Notice( ply, 4, 'Amount must be greater than or equal to 2', NOTIFY_ERROR)
+			NRP.Notice( ply, 4, 'Amount must be greater than or equal to 2', NOTIFY_ERROR)
 			return
 		end
 		if( not ply:CanAfford( amount ) )then
-			NRP:Notice( ply, 4, 'You can not afford this.', NOTIFY_ERROR )
+			NRP.Notice( ply, 4, 'You can not afford this.', NOTIFY_ERROR )
 			return
 		end
 		local e = ply:GetEyeTrace().Entity
 		if( not ( IsValid( e ) and e:IsPlayer() ))then
-			NRP:Notice( ply, 4, 'You must be looking at a player.', NOTIFY_ERROR)
+			NRP.Notice( ply, 4, 'You must be looking at a player.', NOTIFY_ERROR)
 			return
 		end
 		e:AddMoney( tonumber( amount ) )
 		ply:TakeMoney( tonumber( amount ) )
+		NRP.Notice( ply, 4, 'Gave '..e:Name()..' $'..amount..'.')
+		NRP.Notice( e, 4, ply:Name()..' gave you $'..amount..'.')
 	end)
 else
-	NRP:ChatAutocomplete( 'dropmoney', '<amount to drop>' )
-	NRP:ChatAutocomplete( 'give', function( cmd, text )
+	NRP.ChatAutocomplete( 'dropmoney', '<amount to drop>' )
+	NRP.ChatAutocomplete( 'give', function( cmd, text )
 		local e = LocalPlayer():GetEyeTrace().Entity
 		if( IsValid( e ) and e:IsPlayer() )then
 			if( not ( text and tonumber( text ) > 0 ))then

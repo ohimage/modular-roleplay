@@ -11,17 +11,17 @@
 
 local tabs = {}
 
-function NRP:AddMenuTab( tbl )
-	NRP:LoadMessage(NRP.color.grey, "Adding Main Menu tab "..( tbl.name or "<unknown>") )
+NRP.AddMenuTab = function( tbl )
+	NRP.LoadMessage(NRP.color.grey, "Adding Main Menu tab "..( tbl.name or "<unknown>") )
 	table.insert( tabs, tbl )
 end
-function NRP:UpdateMenuTabs( )
+NRP.UpdateMenuTabs = function( )
 	for k,v in pairs( tabs )do
 		v.update( v.panel )
 	end
 end
 
-function NRP:MakeMainMenu()
+NRP.MakeMainMenu = function()
 	local w = ScrW()
 	local h = ScrH()
 	/*=======================================
@@ -45,6 +45,8 @@ function NRP:MakeMainMenu()
 		end)
 		return true
 	end
+	menu.Paint = function() end
+	menu:SetTitle("")
 	menu:SetVisible( false )
 
 	/*=========================
@@ -78,7 +80,6 @@ function NRP:MakeMainMenu()
 		-- VGUI tab shouldnt be needed for much but i figure we should keep a hold of it.
 		v.vguitab = menu.propsheet:AddSheet( v.name, panel, v.icon or "gui/silkicons/user", 
 				false, false, nil)
-		PrintTable( sheet )
 		-- Store the panel in the tab's table incase it's needed.
 		v.panel = panel
 		

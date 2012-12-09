@@ -17,4 +17,4 @@ end
 JOBTAB.update = function( panel )
 	
 end
-NRP:AddMenuTab( JOBTAB )
+NRP.AddMenuTab( JOBTAB )

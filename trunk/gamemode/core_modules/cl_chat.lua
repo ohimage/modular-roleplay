@@ -16,7 +16,7 @@ local autoComplete = {}
 -- takes a command name not including / and a function as the arguements.
 -- function returns the list header, and a list of autocomplete values.
 -- see the OCC chat handler for an example.
-function NRP:ChatAutocomplete( cmd, value )
+NRP.ChatAutocomplete = function( cmd, value )
 	if( not value )then
 		Error("INVALID AUTOCOMPLETE VALUE")
 		return
@@ -161,7 +161,7 @@ autoComplete['ooc'] = function(cmd, arg)
 end
 
 timer.Simple(0,function()
-	for k,v in pairs( NRP:GetAllTeams() )do
+	for k,v in pairs( NRP.GetAllTeams() )do
 		autoComplete[ v.command ] = 'Change team.'
 	end
 end)

@@ -3,6 +3,7 @@ GM.Name = "NeoRP"
 GM.Author = "By TheLastPenguin, Dev DotEXE"
 
 include("config.lua")
+
 local instanceColor -- used in MsgCTBL to show if a message is being printed by clientside or server.
 if( SERVER )then
 	instanceColor = Color( 255, 155, 0 ) -- orange for server.
@@ -40,7 +41,7 @@ CONSOLE PRINTING STUFF MOSTLY
 local MsgCOLD = MsgC
 function MsgC( ... )
 	local arg = {...}
-	local color = NRP.color.white
+	local color = Color( 255, 255, 255 )
 	for k,v in SortedPairs( arg )do
 		if( type( v ) == 'table' and v.r and v.g and v.b and v.a )then
 			color = v
@@ -58,7 +59,7 @@ function MsgC( ... )
 	end
 end
 
-function NRP:MsgC( ... )
+NRP.MsgC = function( ... )
 	MsgC( instanceColor, '[NeoRP] ', ..., '\n')
 end
 
@@ -71,7 +72,7 @@ else
 	file.Write("NeoRP/cl_debuglog.txt", "INITALISED CLIENT DEBUG LOGGING\n" )
 end
 
-function NRP:DebugMsgRAW( ... )
+NRP.DebugMsgRAW = function( ... )
 	MsgC( ... )
 	local msg = {...}
 	table.flaten( msg )
@@ -91,8 +92,8 @@ function NRP:DebugMsgRAW( ... )
 	end
 end
 
-function NRP:DebugMsg( ... )
-	NRP:DebugMsgRAW( instanceColor, '[NeoRP Debug]', ... )
+NRP.DebugMsg = function( ... )
+	NRP.DebugMsgRAW( instanceColor, '[NeoRP Debug]', ... )
 end
 
 /*=========================
@@ -108,17 +109,17 @@ local function LoadMessage( ... )
 		end
 	end
 	if( msgLen <= 1 )then return end
-	NRP:DebugMsgRAW(instanceColor,'| ')
-	NRP:DebugMsgRAW(...)
-	NRP:DebugMsgRAW(string.format('%'..math.max(76 - msgLen,1)..'s', ''),instanceColor,' |\n' )
+	NRP.DebugMsgRAW(instanceColor,'| ')
+	NRP.DebugMsgRAW(...)
+	NRP.DebugMsgRAW(string.format('%'..math.max(76 - msgLen,1)..'s', ''),instanceColor,' |\n' )
 end
 
-function NRP:LoadMessage(...)
+NRP.LoadMessage = function(...)
 	lastbig = 0
 	LoadMessage( ... )
 end
 
-function NRP:LoadMessageBig( ... )
+NRP.LoadMessageBig = function( ... )
 	local msg = {...}
 	local msgLen = 0
 	for k,v in pairs( msg )do
@@ -126,22 +127,22 @@ function NRP:LoadMessageBig( ... )
 			msgLen = msgLen + string.len( v )
 		end
 	end
-	NRP:DebugMsgRAW(instanceColor,'================================================================================\n')
+	NRP.DebugMsgRAW(instanceColor,'================================================================================\n')
 	LoadMessage( ... )
 	if( RealTime() ~= lastbig) then
-		NRP:DebugMsgRAW(instanceColor,'================================================================================\n')
+		NRP.DebugMsgRAW(instanceColor,'================================================================================\n')
 	end
 	lastbig = RealTime()
 end
-function NRP:LoadErrorMessage( ... )
-	NRP:LoadMessage( NRP.color.red,'    [ERROR]', ... )
+NRP.LoadErrorMessage = function( ... )
+	NRP.LoadMessage( NRP.color.red,'    [ERROR]', ... )
 end
 
 /*========================================
 Yes, the AskII art. What did you expect...
 ========================================*/
 
-NRP:DebugMsgRAW( instanceColor, [==[
+NRP.DebugMsgRAW( instanceColor, [==[
   _   _            _____  _____  
  | \ | |          |  __ \|  __ \ 
  |  \| | ___  ___ | |__) | |__) |

@@ -12,7 +12,7 @@
 if(CLIENT)then
 	local function ClientMenu()
 		if( not NRP.mainmenu or not ValidPanel( NRP.mainmenu ) )then
-			NRP:MakeMainMenu()
+			NRP.MakeMainMenu()
 		end
 		if( ValidPanel( NRP.mainmenu ) )then
 			if( NRP.mainmenu:IsVisible()) then
@@ -24,7 +24,7 @@ if(CLIENT)then
 			NRP.mainmenu:SetVisible( true )
 			NRP.mainmenu:MakePopup()
 		end
-		NRP:UpdateMenuTabs( )
+		NRP.UpdateMenuTabs( )
 		hook.Call("NeoRP_MenuOpened",GAMEMODE, menu )
 	end
 	concommand.Add("NRP_Menu",function( ply, cmd, args )

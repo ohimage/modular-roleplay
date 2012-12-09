@@ -12,7 +12,7 @@
 
 local NRP = NRP
 local cfg = NRP.cfg
-function NRP:FormatString( str )
+function NRP.FormatString( str )
 	str = string.gsub( str, '<cur>', cfg.Curency )
 	return str
 end
@@ -25,13 +25,13 @@ if(SERVER)then
 		table.flaten( tbl )
 		return tbl
 	end
-	function NRP:ChatMessage( targs, ... )
+	NRP.ChatMessage = function( targs, ... )
 		local message = BuildMessage( {...} )
 		net.Start("NRP_ChatMessage")
 		net.WriteTable( message )
 		net.Send( targs )
 	end
-	function NRP:ConsoleMessage( targs, ... )
+	NRP.ConsoleMessage = function( targs, ... )
 		local message = BuildMessage( {...} )
 		net.Start("NRP_ConMessage")
 		net.WriteTable( message )
@@ -43,7 +43,7 @@ if(SERVER)then
 	NOTIFY_UNDO = 2
 	NOTIFY_HINT = 3
 	NOTIFY_CLEANUP = 4
-	function NRP:Notice( targs, time, text, icon )
+	NRP.Notice = function( targs, time, text, icon )
 		net.Start( "NRP_Notice" )
 			net.WriteString( text )
 			net.WriteInt( icon or NOTIFY_GENERIC, 4 )
@@ -57,7 +57,7 @@ else
 	end)
 	net.Receive("NRP_ConMessage",function()
 		local tbl = net.ReadTable()
-		NRP:MsgC( unpack( tbl ) )
+		NRP.MsgC( unpack( tbl ) )
 	end)
 	net.Receive("NRP_Notice",function()
 								-- text				icon id		time

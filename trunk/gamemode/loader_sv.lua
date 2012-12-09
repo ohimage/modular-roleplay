@@ -15,7 +15,7 @@ end
 util.AddNetworkString("NeoRP_ModuleList")
 local function SendModuleList( ply )
 	timer.Simple( 1, function()
-		NRP:LoadMessageBig("Sending module list to "..ply:Name())
+		NRP.LoadMessageBig("Sending module list to "..ply:Name())
 		net.Start("NeoRP_ModuleList")
 			net.WriteTable( clModules )
 		net.Send( ply )
@@ -23,7 +23,7 @@ local function SendModuleList( ply )
 end
 hook.Add("PlayerInitialSpawn","NeoRP_Modules", SendModuleList )
 
-function NRP:LoadModule( path )
+NRP.LoadModule = function( path )
 	-- read the module from the file...
 	local text = file.Read(path, "LUA" )
 	if( not text )then
@@ -32,14 +32,14 @@ function NRP:LoadModule( path )
 	end
 	
 	-- find the header.
-	local XML = NRP:LocateXML( text )
+	local XML = NRP.LocateXML( text )
 	if( not XML )then
-		NRP:LoadErrorMessage('XML File header zone not found.')
+		NRP.LoadErrorMessage('XML File header zone not found.')
 		return false
 	end
 	
 	-- parse the file for module.
-	local module = NRP:ParseXML( XML )[1]
+	local module = NRP.ParseXML( XML )[1]
 	local settings = {}
 	
 	-- get a list of module flags and stick em in settings table.
@@ -51,19 +51,19 @@ function NRP:LoadModule( path )
 	
 	-- data sanity check.
 	if( not module.value )then
-		NRP:LoadErrorMessage('XML header missing <module> </module> element.')
+		NRP.LoadErrorMessage('XML header missing <module> </module> element.')
 		return
 	end
 	
 	-- parse module's contents for additional settings.
-	local elements = NRP:ParseXML( module.value )
+	local elements = NRP.ParseXML( module.value )
 	for k,v in pairs( elements )do
 		settings[ v.key ] = v.value
 	end
 	
 	-- PRINT SETTINGS.
 	for k,v in pairs( settings )do
-		NRP:LoadMessage(NRP.color.grey,"          "..k.." = '"..v.."'" )
+		NRP.LoadMessage(NRP.color.grey,"          "..k.." = '"..v.."'" )
 	end
 	
 	if( settings['require'] ~= nil )then
@@ -71,40 +71,40 @@ function NRP:LoadModule( path )
 	end
 	
 	if( not settings['instance'] )then
-		NRP:LoadErrorMessage('MODULE INSTANCE NOT SPECIFIED.')
+		NRP.LoadErrorMessage('MODULE INSTANCE NOT SPECIFIED.')
 		return
 	end
 	
 	if( settings['instance' ] == 'SHARED' )then
 		AddClientModule( path, settings )
-		NRP:QueModule( path, settings )
+		NRP.QueModule( path, settings )
 	elseif( settings['instance'] == 'CLIENT' )then
 		AddClientModule( path, settings )
 	elseif( settings['instance'] == 'SERVER' )then
-		NRP:QueModule( path, settings )
+		NRP.QueModule( path, settings )
 	else
-		NRP:LoadErrorMessage('ERROR. INVALID INSTANCE TYPE '.. settings['instance'] )
+		NRP.LoadErrorMessage('ERROR. INVALID INSTANCE TYPE '.. settings['instance'] )
 	end
 end
 
-function NRP:FindModules( dir )
-	NRP:LoadMessageBig(NRP.color.white,"Scanning Directory "..dir )
+NRP.FindModules = function( dir )
+	NRP.LoadMessageBig(NRP.color.white,"Scanning Directory "..dir )
 	local files, _dirs = file.Find(dir .. "*.lua", "LUA")
 	local n = 1
 	for k,v in pairs(files) do
-		NRP:LoadMessage(NRP.color.white,"     "..n..") Found module "..v )
+		NRP.LoadMessage(NRP.color.white,"     "..n..") Found module "..v )
 		n = n + 1
 		local path = dir..v
-		NRP:LoadModule( path )
+		NRP.LoadModule( path )
 	end
 	NewCLModuleSet()
-	NRP:LoadQue()
+	NRP.LoadQue()
 end
 
-NRP:LoadMessageBig(NRP.color.white,"LOADING MODULES.")
-NRP:FindModules( GAMEMODE.FolderName.."/gamemode/vgui/" )
-NRP:FindModules( GAMEMODE.FolderName.."/gamemode/core_modules/" )
-NRP:FindModules( GAMEMODE.FolderName.."/gamemode/modules/" )
+NRP.LoadMessageBig(NRP.color.white,"LOADING MODULES.")
+NRP.FindModules( GAMEMODE.FolderName.."/gamemode/vgui/" )
+NRP.FindModules( GAMEMODE.FolderName.."/gamemode/core_modules/" )
+NRP.FindModules( GAMEMODE.FolderName.."/gamemode/modules/" )
 
 util.AddNetworkString("NeoRP_ReloadTrig")
 concommand.Add('NRP_Reload',function( ply )
