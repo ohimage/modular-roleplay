@@ -24,7 +24,7 @@ end
 function ENT:Use(activator,caller)
 	if self.PlayerUse == false then return end
 	local class = self.itemtbl.class
-	NRP:Notice(activator, 4, "Picked up "..self.itemtbl.name.."!")
+	NRP.Notice(activator, 4, "Picked up "..self.itemtbl.name.."!")
 	
 	local weapon = ents.Create(class)
 

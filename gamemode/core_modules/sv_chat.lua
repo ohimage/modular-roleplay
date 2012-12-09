@@ -18,20 +18,20 @@ local NRP = NRP
 
 local chatCommands = {}
 
-function NRP:AddChatCommand( cmd, func )
+NRP.AddChatCommand = function( cmd, func )
 	chatCommands[ cmd ] = func
 end
 
 -- adding a basic chat command.
 local OCC = function( ply, text )
 	if( text )then
-		NRP:ChatMessage(player.GetAll(), team.GetColor( ply:Team() ), '(OCC) '..ply:Name(), NRP.color.white, ": "..text )
+		NRP.ChatMessage(player.GetAll(), team.GetColor( ply:Team() ), '(OCC) '..ply:Name(), NRP.color.white, ": "..text )
 	end
 end
-NRP:AddChatCommand( '/', OCC )
-NRP:AddChatCommand( 'ooc', OCC )
-NRP:AddChatCommand( 'oc', OCC )
-NRP:AddChatCommand( 'help', function( ply )
+NRP.AddChatCommand( '/', OCC )
+NRP.AddChatCommand( 'ooc', OCC )
+NRP.AddChatCommand( 'oc', OCC )
+NRP.AddChatCommand( 'help', function( ply )
 	NRP:ConsoleMessage( ply, NRP.color.white, "COMMANDS:")
 	local num = 1
 	for k,v in pairs( chatCommands )do
@@ -52,10 +52,10 @@ local function RunCommand(ply, text )
 	end
 	cmd = string.lower( cmd )
 	if( chatCommands[ cmd ] == nil )then
-		NRP:ChatMessage( ply, NRP.color.red, "Command '"..cmd.."' not found.")
+		NRP.ChatMessage( ply, NRP.color.red, "Command '"..cmd.."' not found.")
 	else
 		if( table.HasValue( NRP.cfg.BlockedCommands, cmd ))then
-			NRP:ChatMessage( ply, NRP.color.orange, "COmmand '"..cmd.."' disabled. Contact server staff if you feel this is an error.")
+			NRP.ChatMessage( ply, NRP.color.orange, "COmmand '"..cmd.."' disabled. Contact server staff if you feel this is an error.")
 		end
 		return chatCommands[ cmd ]( ply, arg )
 	end
@@ -90,7 +90,7 @@ function GM:PlayerSay(ply, text, teamonly, dead)
 				table.insert( plys, v )
 			end
 		end
-		NRP:ChatMessage( plys, team.GetColor( ply:Team() ),ply:Name(), NRP.color.white, ": "..text )
+		NRP.ChatMessage( plys, team.GetColor( ply:Team() ),ply:Name(), NRP.color.white, ": "..text )
 	end
 	return ""
 end

@@ -14,15 +14,15 @@ Please dont find errors... ( if you do report them to thelastpenguin212@gmail.co
 ]]
 local NRP = NRP
 
-NRP:LoadMessageBig("Loading Data Manager.")
+NRP.LoadMessageBig("Loading Data Manager.")
 local TablePrefix = NRP.cfg.TablePrefix
-NRP:LoadMessage("Table Prefix is "..TablePrefix )
+NRP.LoadMessage("Table Prefix is "..TablePrefix )
 
 NRP.DBI = {}
 local DBI = NRP.DBI
 
 -- Perform a query with the prefix_ replaced with the user config setting.
-function DBI:Query( str )
+DBI.Query = function( str )
 	query = string.gsub( str, 'prefix_', TablePrefix )
 	local a, b, c = sql.Query( query )
 	return a, b, c
@@ -34,8 +34,8 @@ local userProperties = {}
 -- add a persisting variable to to the user database.
 -- thease properties will be loaded into access objects for each player.
 =======================================================================*/
-function DBI:AddUserProperty( name, type, default )
-	NRP:LoadMessage( "Registerd user data property "..name)
+DBI.AddUserProperty = function( name, type, default )
+	NRP.LoadMessage( "Registerd user data property "..name)
 	local newProp = {
 		['column'] = name,
 		['type'] = type,
@@ -46,9 +46,9 @@ end
 /*===================================
 Add properties to the user database.
 ===================================*/
-NRP.DBI:AddUserProperty( 'uid', 'INT UNSIGNED', function( ply ) return tostring( ply:UniqueID() ) end ) -- user id for tracking users.
-NRP.DBI:AddUserProperty( 'money', 'BIGINT UNSIGNED', NRP.cfg.StartingBalance ) -- money system.
-NRP.DBI:AddUserProperty( 'custom_name', 'VARCHAR( 30 )', function( ply ) 
+NRP.DBI.AddUserProperty( 'uid', 'INT UNSIGNED', function( ply ) return tostring( ply:UniqueID() ) end ) -- user id for tracking users.
+NRP.DBI.AddUserProperty( 'money', 'BIGINT UNSIGNED', NRP.cfg.StartingBalance ) -- money system.
+NRP.DBI.AddUserProperty( 'custom_name', 'VARCHAR( 30 )', function( ply ) 
 	if( string.len( ply:Name() ) > 0 )then
 		return ply:Name()
 	else
@@ -70,17 +70,17 @@ local SQLDATA_NEWINDEX = function( self, key, value )
 		end
 		data[ key ] = value
 		print("DATAMANAGER SET "..key.." -> "..value.." for player "..self.Entity:Name() )
-		DBI:Query(string.format( 'UPDATE prefix_users SET %s = %s WHERE uid = %s', key, sql.SQLStr( value ), sql.SQLStr( self.Entity:UniqueID() )))
+		DBI.Query(string.format( 'UPDATE prefix_users SET %s = %s WHERE uid = %s', key, sql.SQLStr( value ), sql.SQLStr( self.Entity:UniqueID() )))
 	end
   
 function GM:PlayerInitialSpawn( ply )
-	NRP:LoadMessage("Player "..ply:Name().." spawned.")
-	local res = DBI:Query('SELECT * FROM prefix_users WHERE uid = '..sql.SQLStr( ply:UniqueID() ) )
+	NRP.LoadMessage("Player "..ply:Name().." spawned.")
+	local res = DBI.Query('SELECT * FROM prefix_users WHERE uid = '..sql.SQLStr( ply:UniqueID() ) )
 	if( res )then -- dont do anything if they already have a value in the database.
 		
 	else-- they dont have a value, so lets make one.
 		res = {}
-		NRP:LoadMessageBig("Player "..ply:Name().." doesn't have DB entry. Creating new one.")
+		NRP.LoadMessageBig("Player "..ply:Name().." doesn't have DB entry. Creating new one.")
 		local props, vals = {}, {} -- calculate the default values for the various SQL Properties.
 		for k,v in pairs( userProperties )do
 			table.insert( props, v['column'] )
@@ -94,7 +94,7 @@ function GM:PlayerInitialSpawn( ply )
 				table.insert( vals, sql.SQLStr( defaultVal ) )
 			end
 		end
-		DBI:Query(string.format( "INSERT INTO prefix_users ( %s ) VALUES ( %s )", table.concat( props, ','), table.concat( vals, ',')))
+		DBI.Query(string.format( "INSERT INTO prefix_users ( %s ) VALUES ( %s )", table.concat( props, ','), table.concat( vals, ',')))
 	end
 	
 	-- SQL DATA SYSTEM.
@@ -126,7 +126,7 @@ end
 /*===========================================
 Initialise Database Tables and other stuff...
 ===========================================*/
-function DBI:Init()
+function DBI.Init()
 	-- list of default tables to check for / create if they dont exist.
 	local tables = {
 		"prefix_users ( uid INT UNSIGNED NOT NULL, UNIQUE (uid) )",
@@ -140,24 +140,24 @@ function DBI:Init()
 	-- go through the tables and make them if they dont exist.
 	sql.Begin()
 		for k,v in pairs( tables )do
-			DBI:Query( string.format('CREATE TABLE IF NOT EXISTS %s', v ) )
+			DBI.Query( string.format('CREATE TABLE IF NOT EXISTS %s', v ) )
 		end
 	sql.Commit()
 	
 	-- check that desired colums exist in the user properties table, and make them if they arnt found.
 	for k,v in pairs( userProperties )do
 		PrintTable( v )
-		if( DBI:Query('SELECT '..v['column']..' FROM prefix_users') == false )then
-			NRP:LoadMessage("Adding missing column "..v['column'] )
-			DBI:Query( 'ALTER TABLE prefix_users ADD '.. v['column']..' '.. v['type'] )
+		if( DBI.Query('SELECT '..v['column']..' FROM prefix_users') == false )then
+			NRP.LoadMessage("Adding missing column "..v['column'] )
+			DBI.Query( 'ALTER TABLE prefix_users ADD '.. v['column']..' '.. v['type'] )
 		end
 	end
 end
 
 -- we call DBI:Init twice for extra certainty mostly since some modules may be slow to catch on.
-NRP:LoadMessageBig("Initalising Database Tables.")
-DBI:Init()
+NRP.LoadMessageBig("Initalising Database Tables.")
+DBI.Init()
 function GM:ModulesLoaded()
 	NRP:LoadMessageBig("Checking Database Tables.")
-	DBI:Init()
+	DBI.Init()
 end

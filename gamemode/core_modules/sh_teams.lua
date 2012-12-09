@@ -14,19 +14,19 @@ local teams = {}
 local groups = {}
 local teamPlayers = {} -- table of who's on what teams.
 
-function NRP:GetTeamByID( teamid )
+NRP.GetTeamByID = function( teamid )
 	return teams[ teamid ]
 end
-function NRP:GetAllTeams( )
+NRP.GetAllTeams = function( )
 	return teams
 end
-function NRP:GetAllGroups()
+NRP.GetAllGroups = function()
 	return groups
 end
 
 local plymeta = FindMetaTable("Player")
 function plymeta:TeamTbl()
-	return NRP:GetTeamByID( self:Team() )
+	return NRP.GetTeamByID( self:Team() )
 end
 
 local requiredValues = {
@@ -41,16 +41,16 @@ local requiredValues = {
 
 -- FUNCTION FOR PLAYER CHAT COMMANDS TO CHANGE TEAMS.
 local function ChangeTeamChatCMD( ply, tbl, arg)
-	NRP:ChatMessage(ply,NRP.color.white, "You changed your job to ", tbl.color, tbl.name )
-	NRP:Notice( player.GetAll(), 5, ply:Name().." changed his job to "..( tbl.name or 'unknown' ) )
-	NRP:ChangeTeam( ply, tbl.id ) -- change the team
+	NRP.ChatMessage(ply,NRP.color.white, "You changed your job to ", tbl.color, tbl.name )
+	NRP.Notice( player.GetAll(), 5, ply:Name().." changed his job to "..( tbl.name or 'unknown' ) )
+	NRP.ChangeTeam( ply, tbl.id ) -- change the team
 	if( arg )then -- allow model picker.
 		if( string.match( arg, '[0-9]') == arg and tbl.model[ tonumber( arg ) ])then
 			local m = tbl.model[ tonumber( arg ) ]
 			ply:SetModel( m )
 			ply.NRPModel = m
 		else
-			NRP:Notice( ply, 4, 'Invalid team model ID given.', NOTIFY_ERROR )
+			NRP.Notice( ply, 4, 'Invalid team model ID given.', NOTIFY_ERROR )
 		end
 	end
 end
@@ -63,17 +63,17 @@ MustChangeFrom - list of teams that are required to be this one.
 HOOK_<name> - hooks coming soon
 ]]
 
-function NRP:AddCustomTeam( name, tbl )
+NRP.AddCustomTeam = function( name, tbl )
 	tbl['name'] = name
-	NRP:LoadMessage(NRP.color.white,"Registered team ", tbl.color or NRP.color.red, name )
+	NRP.LoadMessage(NRP.color.white,"Registered team ", tbl.color or NRP.color.red, name )
 	for k,v in pairs( requiredValues )do
 		if( tbl[ v[1] ] == nil )then
 			if( v[2] == nil )then
-				NRP:LoadMessage( NRP.color.red, "TEAM ERROR: MISSING REQUIRED PROPERTY "..v[1].. " IN TEAM "..name )
+				NRP.LoadMessage( NRP.color.red, "TEAM ERROR: MISSING REQUIRED PROPERTY "..v[1].. " IN TEAM "..name )
 				ErrorNoHalt("Team Error.")
 				return
 			else
-				NRP:LoadMessage( NRP.color.grey, "Set Property "..v[1].." to default "..tostring( v[2]))
+				NRP.LoadMessage( NRP.color.grey, "Set Property "..v[1].." to default "..tostring( v[2]))
 				tbl[ v[1] ] = v[2] 
 			end
 		end
@@ -82,12 +82,12 @@ function NRP:AddCustomTeam( name, tbl )
 	teams[ tbl.id ] = tbl
 	team.SetUp( tbl.id, tbl.name, tbl.color )
 	if(SERVER)then
-		NRP:AddChatCommand( tbl.command, function( ply, arg )
+		NRP.AddChatCommand( tbl.command, function( ply, arg )
 			local r, reason = hook.Call("NeoRP_CanChangeTeam", GAMEMODE, ply, tbl )
 			if( r == nil or r == true )then
 				ChangeTeamChatCMD( ply, tbl, arg )
 			else
-				NRP:Notice( ply, 6, reason or "Team change denied.", NOTIFY_ERROR )
+				NRP.Notice( ply, 6, reason or "Team change denied.", NOTIFY_ERROR )
 			end
 		end)
 	end
@@ -99,8 +99,8 @@ function NRP:AddCustomTeam( name, tbl )
 	return tbl.id
 end
 
-function NRP:AddTeamGroup( name, tbl )
-	NRP:LoadMessage(NRP.color.white,"Registered team group ", name )
+NRP.AddTeamGroup = function( name, tbl )
+	NRP.LoadMessage(NRP.color.white,"Registered team group ", name )
 	tbl.name = name
 	tbl.id = #groups + 1
 	groups[ #groups + 1 ] = tbl
@@ -108,7 +108,7 @@ function NRP:AddTeamGroup( name, tbl )
 end
 
 -- raw set the team.
-function NRP:SetPlayerTeam( ply, teamid )
+NRP.SetPlayerTeam = function( ply, teamid )
 	local curTeam = teams[ teamid ]
 	if( not flags )then flags = {} end
 	if( not curTeam )then
@@ -127,14 +127,14 @@ function NRP:SetPlayerTeam( ply, teamid )
 	ply:SetModel( model )
 end
 
--- set with other functionality.
-function NRP:ChangeTeam( ply, teamid )
+-- this should be used to ensure players recieve all team items and proper checks are done.
+NRP.ChangeTeam = function( ply, teamid )
 	if( NRP.cfg.RequireRespawn )then
 		ply:Kill()
 	else
 		GAMEMODE:PlayerSpawn( ply )
 	end
-	NRP:SetPlayerTeam( ply, teamid )
+	NRP.SetPlayerTeam( ply, teamid )
 	GAMEMODE:PlayerSetModel( ply )
 end
 
@@ -176,7 +176,7 @@ end
 
 function GM:PlayerInitialSpawn( ply )
 	timer.Simple(1,function()
-		NRP:SetPlayerTeam( ply, NRP.cfg.DefaultTeam)
+		NRP.SetPlayerTeam( ply, NRP.cfg.DefaultTeam)
 		hook.Call("PlayerLoadout",GAMEMODE, ply)
 	end)
 end
@@ -185,7 +185,7 @@ function GM:PlayerLoadout( ply )
 	ply:StripWeapons()
 	ply:StripAmmo()
 	
-	local t = NRP:GetTeamByID( ply:Team() )
+	local t = NRP.GetTeamByID( ply:Team() )
 	for k,v in pairs( NRP.cfg.DefaultWeapons )do
 		ply:Give( v )
 	end
@@ -268,9 +268,9 @@ if(SERVER)then
 			if( t )then
 				if( t.salery and t.salery > 0 )then
 					v:GiveMoney( t.salery )
-					NRP:Notice( v, 4, "Pay day! You recieved $"..t.salery.."!" )
+					NRP.Notice( v, 4, "Pay day! You recieved $"..t.salery.."!" )
 				else
-					NRP:Notice(v, 4, "Pay day skipped. You are unemployed.",NOTIFY_ERROR)
+					NRP.Notice(v, 4, "Pay day skipped. You are unemployed.",NOTIFY_ERROR)
 				end
 			end
 		end

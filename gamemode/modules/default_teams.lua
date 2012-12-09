@@ -54,7 +54,7 @@ end
 DEFAULT TEAMS
 =============================*/
 
-TEAM_DEVELOPER = NRP:AddCustomTeam( 'Developer', {
+TEAM_DEVELOPER = NRP.AddCustomTeam( 'Developer', {
 	model = NRP.ALL_MODELS,
 	color = NRP.color.cyan,
 	vote = false,
@@ -82,7 +82,7 @@ TEAM_DEVELOPER = NRP:AddCustomTeam( 'Developer', {
 	end
 })
 
-TEAM_CITIZEN = NRP:AddCustomTeam( 'Citizen', {
+TEAM_CITIZEN = NRP.AddCustomTeam( 'Citizen', {
 	model = NRP.CITIZEN_MODELS,
 	color = Color( 0, 155, 0, 255),
 	vote = false,
@@ -93,9 +93,9 @@ TEAM_CITIZEN = NRP:AddCustomTeam( 'Citizen', {
 /*=============================
 SHADY TEAMS
 =============================*/
-GROUP_UNDERWORLD = NRP:AddTeamGroup("Under World", { } )
+GROUP_UNDERWORLD = NRP.AddTeamGroup("Under World", { } )
 
-TEAM_GANG = NRP:AddCustomTeam( 'Gangster', {
+TEAM_GANG = NRP.AddCustomTeam( 'Gangster', {
 	model = NRP.SHADY_MODELS,
 	color = Color( 155, 155, 155, 255),
 	weapons = {
@@ -108,7 +108,7 @@ TEAM_GANG = NRP:AddCustomTeam( 'Gangster', {
 	group = GROUP_UNDERWORLD
 })
 
-TEAM_MOBBOSS = NRP:AddCustomTeam( 'Mob Boss', {
+TEAM_MOBBOSS = NRP.AddCustomTeam( 'Mob Boss', {
 	model = "models/gman_high.mdl",
 	color = Color( 15, 15, 15, 255),
 	vote = false,
@@ -120,9 +120,9 @@ TEAM_MOBBOSS = NRP:AddCustomTeam( 'Mob Boss', {
 /*=============================
 POLICE TEAMS
 =============================*/
-GROUP_POLICE = NRP:AddTeamGroup("Police", { } )
+GROUP_POLICE = NRP.AddTeamGroup("Police", { } )
 
-TEAM_MAYOR = NRP:AddCustomTeam( 'Mayor', {
+TEAM_MAYOR = NRP.AddCustomTeam( 'Mayor', {
 	model = "models/breen.mdl",
 	color = Color( 175, 0, 0, 255),
 	vote = true,
@@ -131,7 +131,7 @@ TEAM_MAYOR = NRP:AddCustomTeam( 'Mayor', {
 	group = GROUP_POLICE
 })
 
-TEAM_POLICE = NRP:AddCustomTeam( 'Police', {
+TEAM_POLICE = NRP.AddCustomTeam( 'Police', {
 	model = "models/breen.mdl",
 	color = Color( 0, 0, 175, 255),
 	vote = true,
@@ -140,7 +140,7 @@ TEAM_POLICE = NRP:AddCustomTeam( 'Police', {
 	group = GROUP_POLICE
 })
 
-TEAM_CHIEF = NRP:AddCustomTeam( 'Chief', {
+TEAM_CHIEF = NRP.AddCustomTeam( 'Chief', {
 	model = "models/breen.mdl",
 	color = Color( 0, 55, 175, 255),
 	vote = true,

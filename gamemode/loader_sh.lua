@@ -4,7 +4,7 @@ if( not GAMEMODE and GM )then GAMEMODE = GM end -- make sure we have the tables 
 /*===================================
 MODULE HEADER PARSER
 ===================================*/
-NRP:LoadMessageBig("Loading Module Parsing Systems.")
+NRP.LoadMessageBig("Loading Module Parsing Systems.")
 
 local function ParseNextElement( str, index)
 	if( not index )then index = 1 end
@@ -41,14 +41,14 @@ local function ParseNextElement( str, index)
 	local elementEndStr = '</'..key..'>'
 	local elementEnd = string.find( str, elementEndStr )
 	if( not elementEnd )then
-		NRP:LoadMessage(NRP.color.red,"UNCLOSED ELEMENT.")
+		NRP.LoadMessage(NRP.color.red,"UNCLOSED ELEMENT.")
 		return false
 	end
 	local value = string.sub( str, closeBracket + 1, elementEnd - 1 )
 	return { ['key'] = key, ['value'] = value, ['flags'] = flags }, index + elementEnd + string.len( elementEndStr )
 end
 
-function NRP:LocateXML( str )
+NRP.LocateXML = function( str )
 	local s = string.find( str, "<xml>")
 	local e = string.find( str, "</xml>")
 	if( s and e )then
@@ -58,7 +58,7 @@ function NRP:LocateXML( str )
 	end
 end
 
-function NRP:ParseXML( str )
+NRP.ParseXML = function( str )
 	local elements = {}
 	local ind = 1
 	local limit = 100
@@ -128,7 +128,7 @@ LOADING MODULES
 =================================*/
 local que = {}
 
-function NRP:QueModule( path, settings )
+NRP.QueModule = function( path, settings )
 	que[ settings.name ] = { p = path, s = settings }
 end
 
@@ -137,43 +137,43 @@ local function QueHasModule( name )
 end
 
 local loaded = {}
-function NRP:LoadQue( )
-	NRP:LoadMessageBig("PROCESSING MODULE QUE.")
+NRP.LoadQue = function( )
+	NRP.LoadMessageBig("PROCESSING MODULE QUE.")
 	--PrintTable( que )
 	
 	-- remove requirements for nonexistant modules.
-	NRP:LoadMessageBig("Checking requirements.")
+	NRP.LoadMessageBig("Checking requirements.")
 	for k,v in pairs( que )do
 		if( v.s.require )then
 			for _, r in pairs( v.s.require )do
 				if( SERVER and string.find( r, 'cl_' ) )then
-					NRP:LoadMessage(NRP.color.white,'     MODULE '..k..' Removed cl require on server '..r..'.' )
+					NRP.LoadMessage(NRP.color.white,'     MODULE '..k..' Removed cl require on server '..r..'.' )
 					v.s.require[ _ ] = nil
 				elseif( CLIENT and string.find( r, 'sv_' ) )then
-					NRP:LoadMessage(NRP.color.white,'     MODULE '..k..' Removed sv require on client '..r..'.' )
+					NRP.LoadMessage(NRP.color.white,'     MODULE '..k..' Removed sv require on client '..r..'.' )
 					v.s.require[ _ ] = nil
 				elseif( not QueHasModule( r ) and not table.HasValue( loaded, r ) )then
-					NRP:LoadMessage(NRP.color.red,'     MODULE '.. k..' Removed requirement '..r..' INVALID.' )
+					NRP.LoadMessage(NRP.color.red,'     MODULE '.. k..' Removed requirement '..r..' INVALID.' )
 					v.s.require[ _ ] = nil
 				else
-					NRP:LoadMessage(NRP.color.grey,'     module '..k..' requires '..r..'.' )
+					NRP.LoadMessage(NRP.color.grey,'     module '..k..' requires '..r..'.' )
 				end
 			end
 		end
 	end
 	
-	NRP:LoadMessageBig("Running modules.")
+	NRP.LoadMessageBig("Running modules.")
 	local cycles = 0
 	while( table.Count( que ) > 0 )do
 		cycles = cycles + 1
-		NRP:LoadMessage(NRP.color.yellow,"Load cycle "..cycles )
+		NRP.LoadMessage(NRP.color.yellow,"Load cycle "..cycles )
 		local queLen = table.Count( que )
 		for k,v in pairs( que )do
 			local req = v.s.require
 			if( not req )then
 				table.insert( loaded, k )
-				NRP:LoadMessage(NRP.color.white, '     '..( #loaded + 1 ).. ') loaded module '..k )
-				NRP:RunModule( v.p, v.s )
+				NRP.LoadMessage(NRP.color.white, '     '..( #loaded + 1 ).. ') loaded module '..k )
+				NRP.RunModule( v.p, v.s )
 				que[ k ] = nil
 			else
 				local run = true
@@ -187,8 +187,8 @@ function NRP:LoadQue( )
 				end
 				if( run )then
 					table.insert( loaded, k )
-					NRP:LoadMessage(NRP.color.white, '     '..( #loaded + 1 ).. ') loaded module '..k )
-					NRP:RunModule( v.p, v.s )
+					NRP.LoadMessage(NRP.color.white, '     '..( #loaded + 1 ).. ') loaded module '..k )
+					NRP.RunModule( v.p, v.s )
 					que[ k ] = nil
 				end
 			end
@@ -199,12 +199,12 @@ function NRP:LoadQue( )
 	end
 	if( table.Count( que ) > 0 )then
 		for k,v in pairs( que )do
-			NRP:LoadMessage(NRP.color.red, '     '..( #loaded + 1 ).. ') FORCING LOAD WITHOUT REQUIREMENTS ON '..k )
+			NRP.LoadMessage(NRP.color.red, '     '..( #loaded + 1 ).. ') FORCING LOAD WITHOUT REQUIREMENTS ON '..k )
 			NRP:RunModule( v.p, v.s )
 		end
 	end
 	
-	NRP:LoadMessageBig(NRP.color.white,"COMPILEING MODULE HOOKS TO GAMEMODE TABLE.")
+	NRP.LoadMessageBig(NRP.color.white,"COMPILEING MODULE HOOKS TO GAMEMODE TABLE.")
 	local all = {}
 	for k,v in pairs( hooks )do
 		all[ k ] = true
@@ -213,15 +213,15 @@ function NRP:LoadQue( )
 		all[ k ] = true
 	end
 	for k,v in pairs( all )do
-		NRP:LoadMessage(NRP.color.white,"     Compiled hook: "..k)
+		NRP.LoadMessage(NRP.color.white,"     Compiled hook: "..k)
 		mhook.Compile( k )
 	end
 	
 	que = {}
 end
 
-function NRP:RunModule( path, moduleTBL)
-	NRP:LoadMessage(NRP.color.white,'          Loading '..path )
+NRP.RunModule = function( path, moduleTBL)
+	NRP.LoadMessage(NRP.color.white,'          Loading '..path )
 	local oldGM = GM
 	GM = {}
 	local status, error = pcall( include, path )
@@ -235,7 +235,7 @@ function NRP:RunModule( path, moduleTBL)
 	
 	for k,v in pairs( result )do
 		if( type( v ) == 'function' )then
-			NRP:LoadMessage(NRP.color.gray,'Added module hook '..k )
+			NRP.LoadMessage(NRP.color.gray,'Added module hook '..k )
 			mhook.Add( k, v )
 		end
 	end
