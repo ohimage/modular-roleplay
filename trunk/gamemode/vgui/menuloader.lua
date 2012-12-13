@@ -21,9 +21,32 @@ NRP.UpdateMenuTabs = function( )
 	end
 end
 
+local widthRatio = NRP.cfg.menu_widthRatio
+local heightRatio = NRP.cfg.menu_heightRatio
+
+NRP.OpenMainMenu = function()
+	local w, h = ScrW(), ScrH()
+	if( not NRP.mainmenu or not ValidPanel( NRP.mainmenu ) )then
+		NRP.MakeMainMenu()
+	end
+	if( ValidPanel( NRP.mainmenu ) )then
+		if( NRP.mainmenu:IsVisible()) then
+			NRP.mainmenu:OnClose( )
+			return
+		end
+		print("Showing menu!")
+		NRP.mainmenu:MoveTo( w * (1 - widthRatio) / 2, h * (1 - heightRatio) / 2, 0.5, 0)
+		NRP.mainmenu:SetVisible( true )
+		NRP.mainmenu:MakePopup()
+		NRP.UpdateMenuTabs( )
+		hook.Call("NeoRP_MenuOpened",GAMEMODE, menu )
+	else
+		chat.AddText(Color(255,0,0),"ERROR! FAILED TO OPEN MENU! CONTACT A NeoRP DEVELOPER!")
+	end
+end
+
 NRP.MakeMainMenu = function()
-	local w = ScrW()
-	local h = ScrH()
+	local w, h = ScrW(), ScrH()
 	/*=======================================
 	MAKE THE MENU PANELS
 	=======================================*/
@@ -33,13 +56,14 @@ NRP.MakeMainMenu = function()
 	
 	print("Making a new menu.")
 	local menu = vgui.Create("NRP_Frame")
-	menu:SetSize( w / 2, h / 2 )
-	menu:SetPos( w / 4, h / 4 )
+	menu:SetSize( w * 0.8, h * 0.8)
+	menu:SetPos( w * (1 - widthRatio) / 2, h, 0.5, 0, 1, nil )
 	menu:SetDeleteOnClose( false )
+	menu:SetDraggable( false )
 	menu.OnClose = function( panel )
 		menu:SetVisible( true )
 		print("Menu close!")
-		menu:MoveTo( w / 4, h, 0.5, 0, 1, nil )
+		menu:MoveTo( w * (1 - widthRatio) / 2, h, 0.5, 0, 1, nil )
 		timer.Simple(0.5,function()
 			menu:SetVisible( false )
 		end)
@@ -73,7 +97,7 @@ NRP.MakeMainMenu = function()
 		-- CREATE THE PANEL FOR THE TAB.
 		local panel = vgui.Create( "DPanel", menu.propsheet )
 		panel:SetPos( 5, 5 )
-		panel:SetSize( 250, 250 )
+		panel:SetSize( menu.propsheet:GetWide() - 10, menu.propsheet:GetTall() - 10 )
 		panel:StretchToParent()
 		panel.Paint = customDraw
 		panel.NRP = v

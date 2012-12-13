@@ -36,6 +36,10 @@ NRP.color.white = Color(255,255,255,255)
 | MODULE SPECIFIC SETTINGS |
 ==========================*/
 
+-- MENU SETTINGS
+cfg.menu_widthRatio = 0.8
+cfg.menu_heightRatio = 0.8
+
 -- LANGUAGE SETTINGS
 cfg.Curency = '$'
 
