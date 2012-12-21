@@ -39,6 +39,7 @@ NRP.color.white = Color(255,255,255,255)
 -- MENU SETTINGS
 cfg.menu_widthRatio = 0.8
 cfg.menu_heightRatio = 0.8
+cfg.MenuKey = 'F4' -- Can be F1, F2, F3, F4
 
 -- LANGUAGE SETTINGS
 cfg.Curency = '$'

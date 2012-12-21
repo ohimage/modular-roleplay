@@ -58,7 +58,7 @@ SETTUP THE DATA TABLE FOR EVERY PLAYER
 AND SEND THEM VALUES FROM OTHER PLAYERS
 ======================================*/
 
-function DelayedInitialSpawn( ply )
+function GM:PlayerReadyForData( ply )
 	local data = {}
 	data.Entity = ply
 	data.money = ply.SQLDATA.money
@@ -77,6 +77,32 @@ function DelayedInitialSpawn( ply )
 		end
 	end
 end
+
+util.AddNetworkString("NRP_CanReceive")
+util.AddNetworkString("NRP_IBeReady")
+local function isDataReady( ply, count )
+	if( ply.dataReady )then
+		ply.dataReady = nil
+		NRP.LoadMessage(NRP.color.white,"Player "..ply:Name().." is ready to receive data.")
+		hook.Call("PlayerReadyForData",GAMEMODE, ply )
+	elseif( count > 10 )then
+		ply:Kick("Player did not receive data pack after 10 retries.")
+	else
+		net.Start("NRP_CanReceive")
+		net.Send( ply )
+		timer.Simple( 1, function()
+			isDataReady( ply, count + 1 )
+		end)
+	end
+end
+
+net.Receive( "NRP_IBeReady", function( length, ply )
+	if( length > 10 )then
+		ply:Kick("Error Net responce overflow.")
+	end
+	ply.dataReady = true
+end)
+
 function GM:PlayerInitialSpawn( ply )
-	timer.Simple(1,function() DelayedInitialSpawn( ply ) end )
+	isDataReady( ply, 0 )
 end

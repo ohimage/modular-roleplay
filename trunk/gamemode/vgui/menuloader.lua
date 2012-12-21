@@ -67,6 +67,7 @@ NRP.MakeMainMenu = function()
 		timer.Simple(0.5,function()
 			menu:SetVisible( false )
 		end)
+		hook.Call("NRP_MainMenuClosed",GAMEMODE, menu )
 		return true
 	end
 	menu.Paint = function() end

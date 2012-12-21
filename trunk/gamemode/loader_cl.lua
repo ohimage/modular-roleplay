@@ -40,6 +40,8 @@ hook.Add("HUDPaint","NRP_Pending",function()
 end)
 
 net.Receive("NeoRP_ReloadTrig",function()
+	RunString([[
 	include(GAMEMODE.FolderName.."/gamemode/loader_sh.lua")
 	include(GAMEMODE.FolderName.."/gamemode/loader_cl.lua")
+	]])
 end)

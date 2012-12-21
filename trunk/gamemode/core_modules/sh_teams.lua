@@ -29,6 +29,55 @@ function plymeta:TeamTbl()
 	return NRP.GetTeamByID( self:Team() )
 end
 
+
+
+/*==================================================
+Vote System
+==================================================*/
+local StartVote
+if(SERVER)then
+	util.AddNetworkString("NRP_StartTeamVote")
+	StartVote = function( ply, team, arg )
+		net.Start("NRP_StartTeamVote")
+			net.WriteEntity( ply )
+			net.WriteInt( team.id, 32 )
+		net.Send( player.GetAll() )
+	end
+elseif(CLIENT)then
+	local vote_list = vgui.Create( "DPanelList", panel )
+	vote_list:SetPos( 5, ScrH() / 3 )
+	vote_list:SetSize( ScrW() / 2, 1000)
+	vote_list:SetSpacing( 5 )
+	vote_list:EnableHorizontal( true )
+	vote_list.Paint = function() end
+	vote_list:EnableVerticalScrollbar( false )
+	
+	net.Receive("NRP_StartTeamVote",function()
+		local ply = net.ReadEntity()
+		local teamid = teams[ net.ReadInt( 32 ) ]
+		if( not teamid )then return end
+		if( not ply )then return end
+		
+		local panel = vgui.Create("DFrame")
+		panel:SetSize( 150, 150 )
+		panel:SetSkin("neorp")
+		vote_list:AddItem( panel )
+		panel.count = 30
+		local function ChangeCounter( )
+			if( not ValidPanel( panel ))then return end
+			if( not panel.count )then return end
+			panel:SetTitle("Time: "..panel.count )
+			panel.count = panel.count - 1
+			if( panel.count == 0 )then
+				panel:Remove()
+			else
+				timer.Simple( 1, ChangeCounter )
+			end
+		end
+		ChangeCounter()
+	end)
+end
+
 local requiredValues = {
 	{'name', nil },
 	{'model', nil },
@@ -45,12 +94,13 @@ local function ChangeTeamChatCMD( ply, tbl, arg)
 	NRP.Notice( player.GetAll(), 5, ply:Name().." changed his job to "..( tbl.name or 'unknown' ) )
 	NRP.ChangeTeam( ply, tbl.id ) -- change the team
 	if( arg )then -- allow model picker.
-		if( string.match( arg, '[0-9]') == arg and tbl.model[ tonumber( arg ) ])then
+		if(tbl.model[ tonumber( arg ) ] ~= nil )then
 			local m = tbl.model[ tonumber( arg ) ]
 			ply:SetModel( m )
 			ply.NRPModel = m
 		else
 			NRP.Notice( ply, 4, 'Invalid team model ID given.', NOTIFY_ERROR )
+			print("INVALID MODEL ID ")
 		end
 	end
 end
@@ -85,9 +135,13 @@ NRP.AddCustomTeam = function( name, tbl )
 		NRP.AddChatCommand( tbl.command, function( ply, arg )
 			local r, reason = hook.Call("NeoRP_CanChangeTeam", GAMEMODE, ply, tbl )
 			if( r == nil or r == true )then
-				ChangeTeamChatCMD( ply, tbl, arg )
+				if( tbl.vote == true )then
+					StartVote( ply, tbl, arg )
+				else
+					ChangeTeamChatCMD( ply, tbl, arg )
+				end
 			else
-				NRP.Notice( ply, 6, reason or "Team change denied.", NOTIFY_ERROR )
+				NRP.Notice( ply, 6, reason or "Unable to change team. ERROR 912 (ERROR CODE NIL).", NOTIFY_ERROR )
 			end
 		end)
 	end
@@ -174,11 +228,9 @@ function GM:PlayerSetModel( ply )
 	return false
 end
 
-function GM:PlayerInitialSpawn( ply )
-	timer.Simple(1,function()
-		NRP.SetPlayerTeam( ply, NRP.cfg.DefaultTeam)
-		hook.Call("PlayerLoadout",GAMEMODE, ply)
-	end)
+function GM:PlayerReadyForData( ply )
+	NRP.SetPlayerTeam( ply, NRP.cfg.DefaultTeam)
+	hook.Call("PlayerLoadout",GAMEMODE, ply)
 end
 
 function GM:PlayerLoadout( ply )

@@ -100,34 +100,20 @@ if(SERVER)then
 		e:Spawn()
 		e:Activate()
 	end)
-	
-	hook.Add("NeoRP_CanBuyShipment","TeamCheck",function(ply, ship, arg)
-		if( ship.teams )then
-			if( type( ship.teams ) == 'table' )then
-				if( not table.HasValue( ship.teams, ply:Team() ) )then
-					return "You arn't the right team to buy this!"
-				end
-			elseif( type( ship.teams ) == 'number' )then
-				if( ship.teams ~= ply:Team() )then
-					return "You arnt the right team to buy this!"
-				end
-			end
-		end
-	end)
 elseif( CLIENT )then
 	
 end
-/*
- TEST SHIPMENT
-*/
-NRP.AddCustomShipment('HL2 Pistol',{
-	model = 'models/weapons/w_pistol.mdl',
-	class = 'weapon_pistol',
-	price = 100
-})
 
-NRP.AddCustomShipment('HL2 SMG',{
-	model = 'models/weapons/w_mach_m249para.mdl',
-	class = 'weapon_smg1',
-	price = 100
-})
+hook.Add("NeoRP_CanBuyShipment","TeamCheck",function(ply, ship, arg)
+	if( ship.teams )then
+		if( type( ship.teams ) == 'table' )then
+			if( not table.HasValue( ship.teams, ply:Team() ) )then
+				return "You arn't the right team to buy this!"
+			end
+		elseif( type( ship.teams ) == 'number' )then
+			if( ship.teams ~= ply:Team() )then
+				return "You arnt the right team to buy this!"
+			end
+		end
+	end
+end)

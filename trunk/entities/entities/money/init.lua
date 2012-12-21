@@ -25,7 +25,7 @@ end
 function ENT:Use(activator,caller)
 	self:Remove() -- remove first since i have seen horrid glitches with this.
 	activator:AddMoney( self.dt.amount or 0 )
-	NRP.Notice(activator, 4, NRP:FormatString( "You have found $" .. (self.dt.amount or 0) .. "!"))
+	NRP.Notice(activator, 4, "You have found $" .. (self.dt.amount or 0) .. "!")
 end
 
 -- stack money to prevent it from building up.

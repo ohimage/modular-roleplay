@@ -109,8 +109,10 @@ NRP.FindModules( GAMEMODE.FolderName.."/gamemode/modules/" )
 util.AddNetworkString("NeoRP_ReloadTrig")
 concommand.Add('NRP_Reload',function( ply )
 	if( not IsValid( ply ) or ply:IsListenServerHost() )then
-		include(GAMEMODE.FolderName.."/gamemode/loader_sh.lua")
-		include(GAMEMODE.FolderName.."/gamemode/loader_sv.lua")
+		RunString([[
+			include(GAMEMODE.FolderName.."/gamemode/loader_sh.lua")
+			include(GAMEMODE.FolderName.."/gamemode/loader_sv.lua")
+		]]) -- this is to prevent occasional crashes when code is reloaded. Not %100 sure if it works.
 		net.Start("NeoRP_ReloadTrig")
 		net.Send( player.GetAll() )
 		for k,v in pairs( player.GetAll() )do

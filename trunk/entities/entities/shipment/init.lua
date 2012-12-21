@@ -10,6 +10,7 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetUseType(SIMPLE_USE)
+	
 	local phys = self:GetPhysicsObject()
 	phys:Wake()
 	
@@ -31,7 +32,8 @@ function ENT:OnTakeDamage(dmg)
 		local max = 0
 		while( max <= 10 and IsValid( self.Entity ) and self.canspawn )do
 			max = max + 1
-			self:SpawnEntity()
+			self:SpawnEntity( max * 10)
+			self.dt.count = self.dt.count - 1
 		end
 		self:Remove()
 	end
@@ -48,7 +50,6 @@ function ENT:Use(activator,caller)
 			self.canspawn = true
 			self:SpawnEntity()
 		end)
-		
 		self.dt.count = self.dt.count - 1
 	end
 end
