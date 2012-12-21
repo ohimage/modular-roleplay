@@ -33,10 +33,12 @@ end
 function GM:CanProperty( ply, ent )
 	if( not ply:IsSuperAdmin() )then
 		ply:ChatPrint("You must be a superadmin to do this!")
-		return false end
+		return false
+	end
 end
 
 function GM:PlayerSpawnSWEP( ply, class, wep )
+	print("Player tried to spawn a weapon.")
 	ply:ChatPrint("This functionality is diabled.")
 	return false;
 end

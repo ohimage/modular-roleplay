@@ -8,6 +8,8 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetUseType(SIMPLE_USE)
+	self:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
+	
 	local phys = self:GetPhysicsObject()
 	-- falco prop protection support.
 	self.nodupe = true

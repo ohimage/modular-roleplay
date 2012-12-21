@@ -95,6 +95,7 @@ function GM:PlayerInitialSpawn( ply )
 			end
 		end
 		DBI.Query(string.format( "INSERT INTO prefix_users ( %s ) VALUES ( %s )", table.concat( props, ','), table.concat( vals, ',')))
+		res = { res }
 	end
 	
 	-- SQL DATA SYSTEM.
@@ -105,7 +106,7 @@ function GM:PlayerInitialSpawn( ply )
 		return end
 	-- if the data looks like a number... it probably is one... so make it one.
 	for k,v in pairs( data )do
-		if( string.match( v, '[0-9]*') == v )then
+		if( string.match( v, '[0-9.-]*') == v )then
 			data[ k ] = tonumber( v )
 		end
 	end

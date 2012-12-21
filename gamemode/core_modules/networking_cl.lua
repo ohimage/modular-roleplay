@@ -37,3 +37,9 @@ function ReceiveNetValue()
 end
 
 net.Receive( 'NRP_NWPlayerValue', ReceiveNetValue )
+
+net.Receive("NRP_CanReceive",function( length )
+	NRP.LoadMessage(NRP.color.white, "RECIEVED DATA READH POLL. RESPONDING 'TRUE'.")
+	net.Start("NRP_IBeReady")
+	net.SendToServer()
+end)

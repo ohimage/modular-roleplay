@@ -62,7 +62,7 @@ if(SERVER)then
 			NRP.Notice( ply, 4, 'Amount must be greater than or equal to 2')
 			return
 		elseif( not ( ply:CanAfford( amount ) ) )then
-			NRP.Notice( ply, 4, NRP:FormatString( "You can not afford to drop <cur>" .. amount .. "."), NOTIFY_ERROR )
+			NRP.Notice( ply, 4, "You can not afford to drop $" .. amount .. ".", NOTIFY_ERROR )
 			return
 		end
 		ply:TakeMoney( amount )
