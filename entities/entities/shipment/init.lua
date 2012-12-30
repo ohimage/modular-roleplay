@@ -65,7 +65,11 @@ function ENT:SpawnEntity( offset )
 	e:Activate()
 	e.itemtbl = curShip
 	
-	e:SetAngles(self:GetAngles())
+	e:SetAngles(self:GetAngles()) -- give ammo for picking up more guns.
+	local wepTbl = weapons.Get( curShip.class )
+	if( wepTbl and wepTbl.Primary )then
+		e.ammo = wepTbl.Primary.DefaultClip
+	end
 	
 	-- position calculations are always the same.
 	local ang = self:GetAngles()

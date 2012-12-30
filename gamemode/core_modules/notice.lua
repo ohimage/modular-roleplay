@@ -62,6 +62,6 @@ else
 	net.Receive("NRP_Notice",function()
 								-- text				icon id		time
 		notification.AddLegacy( net.ReadString(), net.ReadInt( 4 ), net.ReadInt(4))
-		surface.PlaySound("buttons/button15.wav")
+		--surface.PlaySound("buttons/button15.wav")
 	end)
 end

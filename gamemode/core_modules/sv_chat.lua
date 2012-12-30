@@ -85,12 +85,16 @@ function GM:PlayerSay(ply, text, teamonly, dead)
 		return RunCommand( ply, string.sub( text, 2 ) ) or ''
 	else
 		local plys = {}
+		local admins = {}
 		for k,v in pairs(player.GetAll())do
 			if( v:GetPos():Distance( ply:GetPos() ) < NRP.cfg.ChatRadious )then
 				table.insert( plys, v )
+			elseif( v:IsAdmin() )then
+				table.insert( admins, v )
 			end
 		end
 		NRP.ChatMessage( plys, team.GetColor( ply:Team() ),ply:Name(), NRP.color.white, ": "..text )
+		NRP.ConsoleMessage( admins, NRP.color.red, '[NeoRP]', team.GetColor( ply:Team() ),ply:Name(), NRP.color.white, ": "..text )
 	end
 	return ""
 end

@@ -101,7 +101,7 @@ end
 timerFunc()
 
 timer.Destroy("NeoRP_GenPlysCanHear")
-timer.Create("NeoRP_GenPlysCanHear",0.25,0, timerFunc)
+timer.Create("NeoRP_GenPlysCanHear",0.1,0, timerFunc)
 timer.Stop("NeoRP_GenPlysCanHear")
 
 local curCommand = nil
@@ -154,11 +154,12 @@ function GM:ChatTextChanged( text )
 		timer.Start("NeoRP_GenPlysCanHear")
 	end
 end
-
-autoComplete['ooc'] = function(cmd, arg)
+local oocAuto = function(cmd, arg)
 	titleColor = NRP.color.green
 	return 'Players Can Hear', {'Everyone'}
 end
+autoComplete['ooc'] = oocAuto
+autoComplete['/'] = oocAuto
 
 timer.Simple(0,function()
 	for k,v in pairs( NRP.GetAllTeams() )do

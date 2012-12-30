@@ -131,12 +131,10 @@ function DBI.Init()
 	-- list of default tables to check for / create if they dont exist.
 	local tables = {
 		"prefix_users ( uid INT UNSIGNED NOT NULL, UNIQUE (uid) )",
-		"prefix_doors ( map VARCHAR( 200 ), id BIGINT NOT NULL, locked TINYINT, title VARCHAR(30), price SMALLINT )",
-		"prefix_weapons ( uid INT NOT NULL, class VARCHAR( 30 ), ammo1 SMALLINT UNSIGNED, ammo2 SMALLINT UNSIGNED, expires INT)"
+		"prefix_doors ( map VARCHAR(255), x INT, y INT , z INT, title VARCHAR(255), locked TINYINT, UNIQUE( x, y, z, map ) )",
+		"prefix_door_flags ( id BIGINT NOT NULL, flag VARCHAR( 100 ), value TINYINT, UNIQUE( id, flag ))",
+		"prefix_jails ( map VARCHAR(255), x INT, y INT, z INT )"
 	}
-	-- use table.insert( tables, your table shit ) to add a table. DO NOT USE A RETURN VALUE.
-	hook.Call('NRP_RegisterSQLTables', tables)
-	hook.Call('NRP_DB_AddUserProperties', userPropeties)
 	
 	-- go through the tables and make them if they dont exist.
 	sql.Begin()

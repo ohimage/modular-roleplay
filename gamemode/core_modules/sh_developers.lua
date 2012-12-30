@@ -12,7 +12,6 @@
 
 local developers = {
 	['2327752029'] = 'NeoRP Project Leader and Head Coder',
-	['3991656016'] = 'NeoRP Content Developer and Coder'
 }
 
 local plymeta = FindMetaTable('Player')

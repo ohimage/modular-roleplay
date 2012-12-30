@@ -26,6 +26,10 @@ surface.CreateFont( "ShipmentFont",{
 local matBallGlow = Material("models/props_combine/tpballglow")
 function ENT:DrawWeaponPreview()
 	local modelent = self.modelent
+	if( not modelent )then
+		self:Initialize() -- make sure we have a model ent.
+		modelent = self.modelent
+	end
 	local obbmaxs = self:OBBMaxs()
 	local OBBCLModel = modelent:OBBMaxs()
 	
@@ -40,21 +44,33 @@ function ENT:DrawWeaponPreview()
 		local colr = 1 - ((CurTime() - self.spawning) / spawnTime)
 		local colg = (CurTime() - self.spawning) / spawnTime
 		
+		-- Draw the spawning effect
+		local delta = CurTime() - self.spawning
+		local min, max = modelent:OBBMins(), modelent:OBBMaxs()
+		min, max = modelent:LocalToWorld(min), modelent:LocalToWorld(max)
+
+		-- Draw the ghosted weapon
 		render.MaterialOverride(matBallGlow)
-		render.SetColorModulation(colr, colg, 0)
+		render.SetColorModulation(1 - delta, delta, 0) -- From red to green
 		modelent:DrawModel()
 		render.MaterialOverride()
 		render.SetColorModulation(1, 1, 1)
-		render.MaterialOverride()
 
-		local normal = - modelent:GetAngles():Up()
-		local height = modelent:OBBMaxs().z * ((CurTime() - self.spawning) / spawnTime)
-		local pos = modelent:LocalToWorld(Vector(0, 0, modelent:GetPos().z ))
-		local distance = normal:Dot(pos)
+		-- Draw the cut-off weapon
 		render.EnableClipping(true)
-		render.PushCustomClipPlane(normal, distance);
+		-- The clipping plane only draws objects that face the plane
+		local normal = -modelent:GetAngles():Forward()
+		local cutPosition = LerpVector(delta, max, min) -- Where it cuts
+		local cutDistance = normal:Dot(cutPosition)-- Project the vector onto the normal to get the shortest distance between the plane and origin
+
+		-- Activate the plane
+		render.PushCustomClipPlane(normal, cutDistance);
+		-- Draw the partial model
 		modelent:DrawModel()
+		-- Remove the plane
 		render.PopCustomClipPlane()
+
+		render.EnableClipping(false)
 		
 		if( CurTime() - self.spawning > spawnTime )then
 			self.spawning = nil
