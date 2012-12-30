@@ -108,5 +108,7 @@ else
 			return '/give','You must be looking at a player.'
 		end
 	end)
-	
+	function PLYMETA:CanAfford( amount )
+		return self.NETDATA.money >= amount 
+	end
 end 

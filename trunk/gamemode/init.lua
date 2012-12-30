@@ -19,6 +19,7 @@ AddCSLuaFile("shared.lua")
 AddCSLuaFile("config.lua")
 AddCSLuaFile("loader_cl.lua")
 AddCSLuaFile("loader_sh.lua")
+AddCSLuaFile("cl_fonts.lua")
 
 /*================
 INCLUDE FILES
@@ -30,4 +31,4 @@ include("loader_sv.lua")
 /*===============
 RESOURCES
 ===============*/
-resource.AddFile( "materials/neorp/neorp_gwen.png")
+resource.AddSingleFile( "materials/neorp/neorp_gwen.png")
