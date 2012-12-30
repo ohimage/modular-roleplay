@@ -1,4 +1,4 @@
-GM.Version = "0.0.1"
+GM.Version = "1.0.0 Beta"
 GM.Name = "NeoRP"
 GM.Author = "By TheLastPenguin, Dev DotEXE"
 

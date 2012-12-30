@@ -48,11 +48,9 @@ function Entity:LoadDoorData()
 	local dat = res[1]
 	self:SetNWString( 'title', dat.title )
 	if( tonumber( dat.locked ) == 0 )then
-		print("Seting locked to false")
 		self:SetNWBool( 'locked', false)
 		self:Fire("unlock", "", 0)
 	else
-		print("Setting locked to true!")
 		self:SetNWBool( 'locked', true )
 		self:Fire("lock", "", 0)
 	end
@@ -60,9 +58,7 @@ function Entity:LoadDoorData()
 	self.DoorFlags = {}
 	local flags = DBI.Query(string.format( "SELECT * FROM prefix_door_flags WHERE id = "..sql.SQLStr( self.id ) ) )
 	if( flags )then
-		NRP.LoadMessage(NRP.color.blue,"LOADED DOOR WITH FLAGS!")
 		for k,v in pairs( flags )do
-			NRP.LoadMessage(NRP.color.blue,"SET FLAG "..v.flag.." TO "..v.value)
 			self.DoorFlags[ v.flag ] = v.value
 			self:SetNWInt( v.flag, tonumber( v.value ) )
 		end
@@ -75,17 +71,13 @@ LOAD ALL OF THE DOORS ON THE MAP!
 ================================*/
 if(SERVER)then
 	timer.Simple(5, function()
-		NRP.LoadMessage( "Loading Doors Now!")
 		for k,v in pairs( ents.GetAll() )do
 			if( v:IsDoor() )then
-				print("Loaded a door!")
 				v.id = ( v:GetPos().z * 1000 + v:GetPos().y ) * 1000 + v:GetPos().x -- it is extreamly unlikely two doors will have the same id. Should this occure however it is still unlikely it will cause many errors, only some unpredictable behayvor and weirdness.
-				print("Door ID: "..v.id )
 				local dat = v:LoadDoorData()
 				if( dat )then
 					
 				else
-					print("Initalising data for a door.")
 					v:SaveDoorData()
 					v:LoadDoorData() -- we reload the data since some stuff is settup in the load process that isnt done in saving.
 				end
