@@ -30,64 +30,6 @@ function plymeta:TeamTbl()
 end
 
 
-
-/*==================================================
-Vote System
-==================================================*/
-local StartVote
-if(SERVER)then
-	util.AddNetworkString("NRP_StartTeamVote")
-	StartVote = function( ply, team, arg )
-		net.Start("NRP_StartTeamVote")
-			net.WriteEntity( ply )
-			net.WriteInt( team.id, 32 )
-		net.Send( player.GetAll() )
-	end
-elseif(CLIENT)then
-	local vote_list = vgui.Create( "DPanelList", panel )
-	vote_list:SetPos( 5, ScrH() / 3 )
-	vote_list:SetSize( ScrW() / 2, 1000)
-	vote_list:SetSpacing( 5 )
-	vote_list:EnableHorizontal( true )
-	vote_list.Paint = function() end
-	vote_list:EnableVerticalScrollbar( false )
-	
-	net.Receive("NRP_StartTeamVote",function()
-		local ply = net.ReadEntity()
-		local teamid = teams[ net.ReadInt( 32 ) ]
-		if( not teamid )then return end
-		if( not ply )then return end
-		
-		local panel = vgui.Create("DFrame")
-		panel:SetSize( 150, 150 )
-		panel:SetSkin("neorp")
-		vote_list:AddItem( panel )
-		panel.count = 30
-		local function ChangeCounter( )
-			if( not ValidPanel( panel ))then return end
-			if( not panel.count )then return end
-			panel:SetTitle("Time: "..panel.count )
-			panel.count = panel.count - 1
-			if( panel.count == 0 )then
-				panel:Remove()
-			else
-				timer.Simple( 1, ChangeCounter )
-			end
-		end
-		ChangeCounter()
-	end)
-end
-
-local requiredValues = {
-	{'name', nil },
-	{'model', nil },
-	{'vote', false },
-	{'command', nil },
-	{'color', Color(155,0,155) },
-	{'limit',nil},
-	{'salery',45}
-}
-
 -- FUNCTION FOR PLAYER CHAT COMMANDS TO CHANGE TEAMS.
 local function ChangeTeamChatCMD( ply, tbl, arg)
 	NRP.ChatMessage(ply,NRP.color.white, "You changed your job to ", tbl.color, tbl.name )
@@ -102,8 +44,160 @@ local function ChangeTeamChatCMD( ply, tbl, arg)
 			NRP.Notice( ply, 4, 'Invalid team model ID given.', NOTIFY_ERROR )
 			print("INVALID MODEL ID ")
 		end
+	else	
+		
 	end
 end
+
+/*==================================================
+Vote System
+==================================================*/
+local StartVote
+if(SERVER)then
+	util.AddNetworkString("NRP_StartTeamVote")
+	util.AddNetworkString("NRP_TeamVoteSubmit")
+	local votes = {}
+	local curID = 0
+	StartVote = function( ply, team, arg )
+		local thisVoteID = curID
+		curID = curID + 1
+		-- open the vote menu on clients.
+		net.Start("NRP_StartTeamVote")
+			net.WriteInt( thisVoteID, 32 )
+			votes[ thisVoteID ] = 0
+			net.WriteEntity( ply )
+			net.WriteInt( team.id, 32 )
+		net.Send( player.GetAll() )
+		
+		-- process the vote results in 30 seconds.
+		timer.Simple( 30, function()
+			local count = votes[ thisVoteID ]
+			votes[ thisVoteID ] = nil
+			if( not IsValid( ply ) )then return end  
+			local fraction = count / #player.GetAll()
+			if( fraction >= 0.4 )then -- if they win we will check to make sure they can still change, then add them to team.
+				local r, reason = hook.Call("NeoRP_CanChangeTeam", GAMEMODE, ply, team )
+				if( r == nil or r == true )then
+					ChangeTeamChatCMD( ply, team, arg )
+				else
+					NRP.Notice( ply, 6, reason or "Unable to change team. ERROR 912 (ERROR CODE NIL).", NOTIFY_ERROR )
+				end
+			else
+				NRP.Notice( ply, 6, 'You were not voted in as '.. team.name, NOTIFY_ERROR)
+			end
+			ply:CoolDownTimer( 'JobVote', 80 )
+		end)
+	end
+	
+	net.Receive("NRP_TeamVoteSubmit", function( length, ply )
+		if( length > 255 )then ply:Kick("BUFFER OVERFLOW.") end
+		local voteID = net.ReadInt( 32 )
+		local yes_no = net.ReadInt( 4 )
+		if( not votes[ voteID ] )then return end
+		if( yes_no == 0 )then
+			print("Player "..ply:Name().." voted no.")
+			votes[ voteID ] = votes[ voteID ] - 1
+		else
+			print("Player "..ply:Name().." voted yes.")
+			votes[ voteID ] = votes[ voteID ] + 1
+		end
+	end)
+elseif(CLIENT)then
+	surface.CreateFont( "NRP_VoteFont",
+		{
+			font      = "roboto",
+			size      = 20,
+			weight    = 100
+		}
+	 )
+	
+	local vote_list = vgui.Create( "DPanelList", panel )
+	vote_list:SetPos( 5, ScrH() / 3 )
+	vote_list:SetSize( ScrW() / 3, 1000)
+	vote_list:SetSpacing( 5 )
+	vote_list:EnableHorizontal( true )
+	vote_list.Paint = function() end
+	vote_list:EnableVerticalScrollbar( false )
+	
+	net.Receive("NRP_StartTeamVote",function()
+		local voteID = net.ReadInt( 32 )
+		local ply = net.ReadEntity()
+		local team = teams[ net.ReadInt( 32 ) ]
+		if( not team )then return end
+		if( not ply )then return end
+		
+		local panel = vgui.Create("DFrame")
+		panel:SetSize( 150, 150 )
+		panel:SetSkin("neorp")
+		panel.voteID = voteID
+		vote_list:AddItem( panel )
+		panel.count = 30
+		local function ChangeCounter( )
+			if( not ValidPanel( panel ) )then return end
+			panel:SetTitle("Time: "..panel.count )
+			panel.count = panel.count - 1
+			if( panel.count == 0 )then
+				panel:Remove()
+			else
+				timer.Simple( 1, ChangeCounter )
+			end
+		end
+		ChangeCounter()
+		
+		-- lastly since people like pictures right? well... lets give them a picture.
+		local ModelPreview = vgui.Create( "DModelPanel", panel )
+		ModelPreview:SetPos( 20, 40)
+		ModelPreview:SetSize( 110,110 )
+		local models = team.model
+		if( type( models ) ~= 'table' )then
+			models = { models }
+		end
+		ModelPreview:SetModel( models[ math.random(1,#models)] )
+		
+		-- vote buttons.
+		local yes = vgui.Create("DButton", panel )
+		yes:SetPos( 5, 150 - 30 )
+		yes:SetSize( 50, 25 )
+		yes:SetText("Yes")
+		yes.DoClick = function()
+			net.Start( "NRP_TeamVoteSubmit" )
+				net.WriteInt( panel.voteID, 32 )
+				net.WriteInt( 1, 4 )
+			net.SendToServer( )
+			panel:Close()
+		end
+		
+		local no = vgui.Create("DButton", panel )
+		no:SetPos( 150 - 55, 150 - 30 )
+		no:SetSize( 50, 25 )
+		no:SetText("No")
+		no.DoClick = function()
+			net.Start( "NRP_TeamVoteSubmit" )
+				net.WriteInt( panel.voteID, 32 )
+				net.WriteInt( 0, 4 )
+			net.SendToServer( )
+			panel:Close()
+		end
+		
+		-- and people also should probably know who the player is and what the team is.
+		local voteinfo = vgui.Create("DLabel", panel )
+		voteinfo:SetPos( 5, 25 )
+		voteinfo:SetText( team.name.."\n"..ply:Name() )
+		voteinfo:SetFont('NRP_VoteFont')
+		voteinfo:SetColor( Color( 0, 0, 0))
+		voteinfo:SizeToContents( true )
+	end)
+end
+
+local requiredValues = {
+	{'name', nil },
+	{'model', nil },
+	{'vote', false },
+	{'command', nil },
+	{'color', Color(155,0,155) },
+	{'limit',nil},
+	{'salery',45}
+}
 
 --[[
 OTHER VALUES:
@@ -138,6 +232,7 @@ NRP.AddCustomTeam = function( name, tbl )
 				if( tbl.vote == true )then
 					StartVote( ply, tbl, arg )
 				else
+					ply:CoolDownTimer( 'JobVote', 40 )
 					ChangeTeamChatCMD( ply, tbl, arg )
 				end
 			else
@@ -237,11 +332,12 @@ function GM:PlayerLoadout( ply )
 	ply:StripWeapons()
 	ply:StripAmmo()
 	
-	local t = NRP.GetTeamByID( ply:Team() )
+	local t = teams[ ply:Team() ]
 	for k,v in pairs( NRP.cfg.DefaultWeapons )do
 		ply:Give( v )
 	end
 	if( t )then
+		print("Giving player team weapons!")
 		if( not t.weapons )then return end
 		if( type( t.weapons ) ~= 'table' )then return end
 		for k,v in pairs( t.weapons )do
@@ -309,6 +405,13 @@ hook.Add("NeoRP_CanChangeTeam","ChangeFrom",function( ply, tbl )
 		return false, string.format("You must be one of %s to be this team.", table.concat( msg, ', ' ) )
 	else
 		return
+	end
+end)
+
+hook.Add("NeoRP_CanChangeTeam","CoolDown",function( ply, teamtbl )
+	local res, remainder = ply:IsCooledDown('JobVote')
+	if( res == false)then
+		return false, "Please wait "..math.Round( remainder ).." seconds before changing your team."
 	end
 end)
 

@@ -43,7 +43,7 @@ if(SERVER)then
 		local e = ents.Create("money")
 		e:SetPos( pos )
 		e.dt.amount = amount
-		e:Spawn()
+		e:Spawn() 
 		e:Activate()
 		return e
 	end

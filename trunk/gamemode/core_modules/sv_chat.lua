@@ -97,7 +97,7 @@ function GM:PlayerSay(ply, text, teamonly, dead)
 		NRP.ConsoleMessage( admins, NRP.color.red, '[NeoRP]', team.GetColor( ply:Team() ),ply:Name(), NRP.color.white, ": "..text )
 	end
 	return ""
-end
+end 
 
 local function ReplaceChatHooks()
 	if not hook.GetTable()['PlayerSay'] then return end

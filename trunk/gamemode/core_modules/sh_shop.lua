@@ -30,7 +30,9 @@ local shipReqVals = {
 	{'model', nil },
 	{'crate', 'models/items/item_item_crate.mdl'},
 	{'class', nil },
-	{'price', nil }
+	{'price', nil },
+	{'isEntity', false },
+	{'amounts', {[5] = 1, [10] = 0.9, [25] = 0.8} }
 }
 
 NRP.AddCustomShipment = function( name, tbl )
@@ -52,6 +54,12 @@ NRP.AddCustomShipment = function( name, tbl )
 	tbl.id = #shipments + 1
 	shipments[ tbl.id ] = tbl
 end
+ 
+NRP.AddCustomEntity = function( name, tbl )
+	tbl.isEntity = true
+	NRP.AddCustomShipment( name, tbl )
+end
+
 /*=====================================
 BUYING SHIPMENTS
 =====================================*/
@@ -70,9 +78,17 @@ if(SERVER)then
 			return
 		end
 		local curShip = shipments[ id ]
-		local cost = curShip.price * count
+		if( curShip.isEntity == true )then
+			NRP.Notice( ply, 4, 'Item is an entity. Only buy 1 at a time.', NOTIFY_ERROR )
+		end
+		if( not curShip.amounts[ count ] )then
+			NRP.Notice( ply, 4, 'Invalid item quantity given.', NOTIFY_ERROR )
+			return
+		end
+		local cost = curShip.price * count * curShip.amounts[ count ]
 		if( not ply:CanAfford( cost ) )then -- make sure the player can afford the price.
 			NRP.Notice( ply, 4, 'You cant afford this shipment!', NOTIFY_ERROR )
+			return
 		end
 		
 		-- call hook to allow developers to modify the buy checks.
@@ -89,16 +105,25 @@ if(SERVER)then
 		ply:TakeMoney( cost )
 		NRP.Notice( ply, 4, 'You bought a shipment of '.. curShip.name .. ' for '.. ( cost ) ) 
 		
-		local e = ents.Create("shipment")
-		e:SetPos( ply:GetLimitedEyeTrace( 100 ).HitPos )
-		e.dt.item = id
-		e.dt.owner = ply
-		e.dt.count = count
-		e.spawnfunc = curShip.spawnfunc
-		
-		e:SetModel( curShip.crate )
-		e:Spawn()
-		e:Activate()
+		if( curShip.isEntity )then -- allows for selling entities.
+			local e = ents.Create(curShip.class)
+			e:SetPos( ply:GetLimitedEyeTrace( 100 ).HitPos )
+			e.dt.owner = ply
+			
+			e:Spawn()
+			e:Activate()
+		else
+			local e = ents.Create("shipment")
+			e:SetPos( ply:GetLimitedEyeTrace( 100 ).HitPos )
+			e.dt.item = id
+			e.dt.owner = ply
+			e.dt.count = count
+			e.spawnfunc = curShip.spawnfunc
+			
+			e:SetModel( curShip.crate )
+			e:Spawn()
+			e:Activate()
+		end
 	end)
 elseif( CLIENT )then
 	
