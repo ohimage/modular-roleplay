@@ -174,7 +174,7 @@ if(CLIENT)then
 				if( door:Door_GetFlag( "_"..v.command ) == 1 )then
 					draw.DrawText( v.name, "NRP_DoorLabel",  0,  pos, team.GetColor( v.id ) ,  TEXT_ALIGN_CENTER )
 					pos = pos + 30
-				end
+				end 
 			end
 		else
 			draw.DrawText( "Unowned Door",  "NRP_DoorLabel",  0,  0,Color( 255, 0, 0, 255 ) ,  TEXT_ALIGN_CENTER )
