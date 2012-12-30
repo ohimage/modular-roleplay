@@ -22,7 +22,7 @@ SWEP.AdminSpawnable = true
 SWEP.Sound = "doors/door_latch3.wav"
 SWEP.Primary.ClipSize = -1
 SWEP.Primary.DefaultClip = 0
-SWEP.Primary.Automatic = false
+SWEP.Primary.Automatic = false 
 SWEP.Primary.Ammo = ""
 
 SWEP.Secondary.ClipSize = -1
