@@ -241,39 +241,26 @@ surface.CreateFont( "PlayerNameTags10",
 		antialias = false
 	})
 
-local function getHeadPos( ply )
-	if( not ( IsValid( ply ) and ply:Alive() ))then	
-		return nil
-	end
-	local lookup = ply:LookupBone("ValveBiped.Bip01_Head1")
-	if( lookup )then
-		return ply:GetBonePosition( lookup )
-	else
-		return nil
-	end
-end
 
 function GM:PostDrawOpaqueRenderables()
 	if( not LocalPlayer():Alive() )then return end
-	local myview = getHeadPos( LocalPlayer() )
+	local myview = LocalPlayer():EyePos()
 	if( not myview )then return end
 	local aimEnt = LocalPlayer():GetEyeTrace().Entity
 	for k,v in pairs(player.GetAll())do
-		local status, headpos = pcall( getHeadPos, v )
-		if( status == true )then
-			if( v ~= LocalPlayer() and v ~= aimEnt and headpos and myview:Distance( headpos ) < 500 and v:GetColor().a > 20 )then
-				local vecdir = myview - headpos + offsetVec
-				local angle =  Angle( 0, vecdir:Angle().yaw + 90, 90 )
-				cam.Start3D2D(headpos + offsetVec, angle, 0.1)
-					if( v.DarkRPVars )then
-						draw.DrawText( v:Name(),  "PlayerNameTags30",  0,  0,team.GetColor( v:Team() ) ,  TEXT_ALIGN_CENTER )
-					end
-				cam.End3D2D()
-			end
+		local headpos = v:EyePos()
+		if( v ~= LocalPlayer() and v ~= aimEnt and headpos and myview:Distance( headpos ) < 500 and v:GetColor().a > 20 )then
+			local vecdir = myview - headpos + offsetVec
+			local angle =  Angle( 0, vecdir:Angle().yaw + 90, 90 )
+			cam.Start3D2D(headpos + offsetVec, angle, 0.1)
+				if( v.DarkRPVars )then
+					draw.DrawText( v:Name(),  "PlayerNameTags30",  0,  0,team.GetColor( v:Team() ) ,  TEXT_ALIGN_CENTER )
+				end
+			cam.End3D2D()
 		end
 	end
 	if( IsValid( aimEnt ) and aimEnt:IsPlayer() )then
-		local headpos = getHeadPos( aimEnt )
+		local headpos = aimEnt:EyePos()
 		local vecdir = myview - headpos + offsetVec * 2
 		local angle =  Angle( 0, vecdir:Angle().yaw + 90, 90 )
 		cam.Start3D2D(headpos + offsetVec2, angle, 0.1)

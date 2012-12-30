@@ -51,8 +51,6 @@ end
 DEFAULT TEAMS
 =============================*/
 
-<<<<<<< .mine
-=======
 TEAM_DEVELOPER = NRP.AddCustomTeam( 'Developer', {
 	model = NRP.ALL_MODELS,
 	color = NRP.color.cyan,
@@ -84,7 +82,6 @@ NeoRP developer.
 One of the dedicated people who make this gamemode possible through their time and efforts spent in it's development.]]
 })
 
->>>>>>> .r25
 TEAM_CITIZEN = NRP.AddCustomTeam( 'Citizen', {
 	model = NRP.CITIZEN_MODELS,
 	color = Color( 0, 155, 0, 255),
@@ -161,30 +158,16 @@ TEAM_POLICE = NRP.AddCustomTeam( 'Police', {
 	color = Color( 0, 0, 175, 255),
 	vote = true,
 	command = 'police',
-<<<<<<< .mine
 	weapons = {'weapon_pistol' , 'arrest_stick', 'unarrest_stick'},
-=======
-	weapons = {'weapon_pistol'},
->>>>>>> .r25
 	limit = 1,
-<<<<<<< .mine
 	group = GROUP_POLICE,
-	desc = [[
-As a police officer it is your duty to keep law and order.
-You carry out the mayor's orders and uphold the laws of the land.
-Should you find anyone breaking these laws you may arrest them to keep them off the streets.
-
-You may not arrest anyone without just cause!!!]],
-	IsCP = true
-=======
-	group = GROUP_POLICE,
+	IsCP = true,
 	desc = [[
 As a police officer it is your duty to keep law and order.
 You carry out the mayor's orders and uphold the laws of the land.
 Should you find anyone breaking these laws you may arrest them to keep them off the streets.
 
 You may not arrest anyone without just cause!!!]]
->>>>>>> .r25
 })
 
 TEAM_CHIEF = NRP.AddCustomTeam( 'Chief', {
@@ -192,24 +175,10 @@ TEAM_CHIEF = NRP.AddCustomTeam( 'Chief', {
 	color = Color( 0, 55, 175, 255),
 	vote = true,
 	command = 'chief',
-<<<<<<< .mine
 	weapons = { 'weapon_375', 'arrest_stick', 'unarrest_stick' },
-=======
-	weapons = { 'weapon_375' },
->>>>>>> .r25
 	limit = 1,
-<<<<<<< .mine
-	group = GROUP_POLICE,
-	desc = [[
-As police Chief you must listen to informants and keep track of the crime paturns.
-The Chief must organise police Patrols, instruct investigations, keep track of suspisicous players and reported activities, and investigate possibly dirty cops.
-You are also required to give reports to the mayor and obey his instructions should he give you any.
-
-YOU MAY NOT WORK WITH CRIME ORGANISATIONS OR OVERTHROW THE MAYOR.
-]],
 	IsCP = true,
 	CanSetJail = true
-=======
 	group = GROUP_POLICE,
 	desc = [[
 As police Chief you must listen to informants and keep track of the crime paturns.
@@ -219,7 +188,6 @@ You are also required to give reports to the mayor and obey his instructions sho
 YOU MAY NOT WORK WITH CRIME ORGANISATIONS OR OVERTHROW THE MAYOR.
 ]],
 	vote = true
->>>>>>> .r25
 })
 
 TEAM_GUNDEALER = NRP.AddCustomTeam( 'Gun Dealer', {

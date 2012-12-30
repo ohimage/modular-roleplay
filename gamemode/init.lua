@@ -6,7 +6,7 @@ if table.Count(file.Find("*", "cstrike")) == 0 then
 	timer.Create("TheresNoCSS", 10, 0, function()
 		for k,v in pairs(player.GetAll()) do
 			v:ChatPrint("CSS isn't installed correctly! You need it for "..GM.Name.." to work correctly.")
-			print("Counter Strike: Source is incorrectly installed!\nYou need it for DarkRP to work!")
+			print("Counter Strike: Source is incorrectly installed!\nYou need it for "..GM.Name.." to work!")
 		end
 	end)
 end

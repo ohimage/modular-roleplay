@@ -1,4 +1,3 @@
-<<<<<<< .mine
 /*
 <xml>
 	<module>
@@ -55,8 +54,29 @@ NRP.AddCustomShipment('Five-Seven',{
 	price = 84,
 	category = 'Pistols'
 })
+
+NRP.AddCustomShipment('USP',{
+	model = 'models/weapons/w_pist_usp.mdl',
+	class = 'weapon_real_cs_usp',
+	price = 97,
+	category = 'Pistols'
+})
+
+NRP.AddCustomShipment('Dual Elites',{
+	model = 'models/weapons/w_pist_elite_dropped.mdl',
+	class = 'weapon_real_cs_elites',
+	price = 196,
+	category = 'Pistols'
+})
+
+NRP.AddCustomShipment('Deagle',{
+	model = 'models/weapons/w_pist_deagle.mdl',
+	class = 'weapon_real_cs_desert_eagle',
+	price = 208,
+	category = 'Pistols'
+})
 --SMGS
-NRP.AddCustomShipment('Mac10',{
+NRP.AddCustomShipment('Mac 10',{
 	model = 'models/weapons/w_smg_mac10.mdl',
 	class = 'weapon_real_cs_mac10',
 	price = 125,
@@ -76,15 +96,29 @@ NRP.AddCustomShipment('P90',{
 	price = 195,
 	category = 'SMGS'
 })
+
+NRP.AddCustomShipment('TMP',{
+	model = 'models/weapons/w_smg_tmp.mdl',
+	class = 'weapon_real_cs_tmp',
+	price = 203,
+	category = 'SMGS'
+})
+
+NRP.AddCustomShipment('UMP 45',{
+	model = 'models/weapons/w_smg_ump45.mdl',
+	class = 'weapon_real_cs_ump_45',
+	price = 271,
+	category = 'SMGS'
+})
 --Shotguns
-NRP.AddCustomShipment('Pumpshotgun',{
+NRP.AddCustomShipment('Pump Shotgun',{
 	model = 'models/weapons/w_shot_m3super90.mdl',
 	class = 'weapon_real_cs_pumpshotgun',
 	price = 155,
 	category = 'Shotguns'
 })
 
-NRP.AddCustomShipment('Autoshotgun',{
+NRP.AddCustomShipment('Auto Shotgun',{
 	model = 'models/weapons/w_shot_xm1014.mdl',
 	class = 'weapon_real_cs_xm1014',
 	price = 245,
@@ -105,45 +139,87 @@ NRP.AddCustomShipment('M4',{
 	category = 'Rifles'
 })
 
-NRP.AddCustomShipment('AWP',{
-	model = 'models/weapons/w_snip_awp.mdl',
-	class = 'weapon_real_cs_awp',
-	price = 550,
+NRP.AddCustomShipment('Steyr Aug',{
+	model = 'models/weapons/w_rif_aug.mdl',
+	class = 'weapon_real_cs_aug',
+	price = 458,
 	category = 'Rifles'
 })
 
-
-
-=======
---[[
-<xml>
-	<module>
-		<name>default_weapons</name>
-		<author>TheLastPenguin</author>
-		<desc>Default set of weapons.</desc>
-		<instance>SHARED</instance>
-	</module>
-</xml>
-]]
-
-NRP.AddCustomShipment('HL2 Pistol',{
-	model = 'models/weapons/w_pistol.mdl',
-	class = 'weapon_pistol',
-	price = 100,
-	category = 'Weapons'
+NRP.AddCustomShipment('SG552',{
+	model = 'models/weapons/w_rif_sg552.mdl',
+	class = 'weapon_real_cs_sg552',
+	price = 484,
+	category = 'Rifles'
 })
 
-NRP.AddCustomShipment('HL2 SMG',{
-	model = 'models/weapons/w_smg1.mdl',
-	class = 'weapon_smg1',
-	price = 200,
-	category = 'Weapons',
-	teams = {TEAM_MAYOR}
+NRP.AddCustomShipment('Galil',{
+	model = 'models/weapons/w_rif_galil.mdl',
+	class = 'weapon_real_cs_galil',
+	price = 503,
+	category = 'Rifles'
 })
 
+NRP.AddCustomShipment('Famas',{
+	model = 'models/weapons/w_rif_famas.mdl',
+	class = 'weapon_real_cs_famas',
+	price = 545,
+	category = 'Rifles'
+})
+--LightMachinegGun
 NRP.AddCustomShipment('M249',{
 	model = 'models/weapons/w_mach_m249para.mdl',
-	class = 'weapon_smg1',
-	price = 500--,
-	--category = 'Weapons'
-})>>>>>>> .r25
+	class = 'weapon_real_cs_m249',
+	price = 1005,
+	category = 'LightMachinegGun'
+})
+--SniperRifles
+NRP.AddCustomShipment('Scout',{
+	model = 'models/weapons/w_snip_scout.mdl',
+	class = 'weapon_real_cs_scout',
+	price = 460,
+	category = 'SniperRifles'
+})
+
+NRP.AddCustomShipment('SG550',{
+	model = 'models/weapons/w_snip_sg550.mdl',
+	class = 'weapon_real_cs_sg550',
+	price = 512,
+	category = 'SniperRifles'
+})
+
+NRP.AddCustomShipment('G3SG1',{
+	model = 'models/weapons/w_snip_g3sg1.mdl',
+	class = 'weapon_real_cs_g3sg1',
+	price = 620,
+	category = 'SniperRifles'
+})
+
+NRP.AddCustomShipment('AWP',{
+	model = 'models/weapons/w_snip_awp.mdl',
+	class = 'weapon_real_cs_awp',
+	price = 740,
+	category = 'SniperRifles'
+})
+--Grenades
+NRP.AddCustomShipment('Flash Grenade',{
+	model = 'models/weapons/w_eq_flashbang_thrown.mdl',
+	class = 'weapon_real_cs_flash',
+	price = 207,
+	category = 'Grenades'
+})
+
+NRP.AddCustomShipment('Smoke Grenade',{
+	model = 'models/weapons/w_eq_smokegrenade.mdl',
+	class = 'weapon_real_cs_smoke',
+	price = 303,
+	category = 'Grenades'
+})
+
+NRP.AddCustomShipment('Frag Grenade',{
+	model = 'models/weapons/w_eq_fraggrenade.mdl',
+	class = 'weapon_real_cs_grenade',
+	price = 410,
+	category = 'Grenades'
+})
+-- End of file.

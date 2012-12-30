@@ -37,7 +37,6 @@ function GM:CanProperty( ply, ent )
 	end
 end
 
-<<<<<<< .mine
 hook.Add("PlayerGiveSWEP","NO SWEPS",function( ply, class, wep )
 	NRP.Notice( ply, 6, "ERROR: You do not have permission to spawn weapons.", NOTIFY_ERROR)
 	if( NRP.cfg.CanGiveSWEP )then
@@ -67,10 +66,10 @@ end)
 
 function GM:GravGunPunt( ply )
 	return false
-=======
+end
+
 function GM:PlayerSpawnSWEP( ply, class, wep )
 	print("Player tried to spawn a weapon.")
 	ply:ChatPrint("This functionality is diabled.")
 	return false;
->>>>>>> .r25
 end
