@@ -147,6 +147,13 @@ if(CLIENT)then
 			weight    = 300
 		}
 	 )
+	 surface.CreateFont( "NRP_DoorLabel_Hand",
+		{
+			font      = "akbar",
+			size      = 30,
+			weight    = 300
+		}
+	 )
 	
 	local gradient = Material("gui/center_gradient")
 	local function DrawDoor( door )
@@ -171,21 +178,25 @@ if(CLIENT)then
 		else
 			draw.DrawText( "Unowned Door",  "NRP_DoorLabel",  0,  0,Color( 255, 0, 0, 255 ) ,  TEXT_ALIGN_CENTER )
 		end
-		draw.DrawText( door:GetNWString("title"),  "NRP_DoorLabel",  0,  30,Color( 0, 55, 55, 255 ) ,  TEXT_ALIGN_CENTER )
+		draw.DrawText( door:GetNWString("title"),  "NRP_DoorLabel_Hand",  0,  30,Color( 55, 55, 55, 255 ) ,  TEXT_ALIGN_CENTER )
 	end
 	
 	function GM:PostDrawOpaqueRenderables()
-		lPos = LocalPlayer():GetPos()
+		lPos = LocalPlayer():EyePos()
 		for k,v in pairs( doors )do
 			if( v:GetPos():Distance( lPos ) < 1000 )then
 				DoorCalculations( v )
-				cam.Start3D2D(v.frontCenter, v.forwardAngle, 0.1)
-					DrawDoor( v )
-				cam.End3D2D()
-				
-				cam.Start3D2D(v.backCenter, v.backwardAngle, 0.1)
-					DrawDoor( v )
-				cam.End3D2D()
+				-- just think about it... the closest surface will be the forward facing one.
+				-- so why render the one facing backward?.. this if statement lets us skip it.
+				if( lPos:Distance( v.frontCenter ) < lPos:Distance( v.backCenter ))then
+					cam.Start3D2D(v.frontCenter, v.forwardAngle, 0.1)
+						DrawDoor( v )
+					cam.End3D2D()
+				else
+					cam.Start3D2D(v.backCenter, v.backwardAngle, 0.1)
+						DrawDoor( v )
+					cam.End3D2D()
+				end
 			end
 		end
 	end

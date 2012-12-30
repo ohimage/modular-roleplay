@@ -38,10 +38,10 @@ AddAmountUpgrade("Nuclear Money Printer", 50000, 5000 ) -- tier 7
 
 AddSpeedUpgrade( "Normal", 0, 1 ) -- default level
 AddSpeedUpgrade( "Turbo Fan", 600, 0.8 )
-AddSpeedUpgrade( "Ink Injector", 800, 0.6 )
-AddSpeedUpgrade( "Paper Ram", 1200, 0.5 )
-AddSpeedUpgrade( "Lazor Printing", 3000, 0.4 )
-AddSpeedUpgrade( "Quantom Ink", 5000, 0.2 )
+AddSpeedUpgrade( "Ink Injector", 800, 0.7 )
+AddSpeedUpgrade( "Paper Ram", 1200, 0.6 )
+AddSpeedUpgrade( "Lazor Printing", 3000, 0.5 )
+AddSpeedUpgrade( "Quantom Ink", 5000, 0.4 )
 
 AddDurabilityUpgrade( "Normal", 0, 27 )
 AddDurabilityUpgrade( "AntiStatic Paint", 200, 40 )

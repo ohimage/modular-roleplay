@@ -27,7 +27,7 @@ function ENT:Use(activator,caller)
 	local amount = self.dt.amount
 
 	activator:AddMoney(amount or 0)
-	GAMEMODE:Notify(activator, 1, 4, "You melt down and sell scrapmetal for $"..amount)
+	NRP.Notice(activator, 6, "You melt down and sell scrapmetal for $"..amount)
 	self:Remove()
 end
 

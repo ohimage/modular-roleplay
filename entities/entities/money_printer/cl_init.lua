@@ -9,6 +9,7 @@ end
 
 local UserIcon = Material("icon16/user.png")
 
+local PRINTER_FONT = NRP.RequestFont( 30 )
 function ENT:Draw()
 	self:DrawModel()
 
@@ -18,7 +19,7 @@ function ENT:Draw()
 	local owner = self.dt.owning_ent
 	owner = (IsValid(owner) and owner:Nick()) or "unknown"
 
-	surface.SetFont("HUDNumber5")
+	surface.SetFont( PRINTER_FONT)
 	local TextWidth = surface.GetTextSize("Money printer")
 	local TextWidth2 = surface.GetTextSize(owner)
 
@@ -28,7 +29,7 @@ function ENT:Draw()
 		
 		local i = 0
 		if( LocalPlayer():GetEyeTrace().Entity == self )then
-			draw.DrawText(  "Double press 'e' to show\nupgrade menu.",  "HUDNumber5",  0, -100,  Color(255, 255, 255, 255),  TEXT_ALIGN_CENTER )
+			draw.DrawText(  "Double press 'e' to show\nupgrade menu.",  PRINTER_FONT,  0, -100,  Color(255, 255, 255, 255),  TEXT_ALIGN_CENTER )
 			for k,v in pairs( u )do
 				-- icon width is 45. Icon height is 48
 				local CurUpgrade = v[ self:GetNWInt( k, 1 ) ]
@@ -36,7 +37,7 @@ function ENT:Draw()
 				local Width = surface.GetTextSize(str)
 				local IconWidth = 38 * self:GetNWInt( k, 1 )
 				local YPos = ( 48 + 40 ) * i - 40
-				draw.WordBox(2, -Width*0.5, YPos, str, "HUDNumber5", Color(0, 0, 200, 100), Color(255,255,255,255))
+				draw.WordBox(2, -Width*0.5, YPos, str, PRINTER_FONT, Color(0, 0, 200, 100), Color(255,255,255,255))
 				surface.SetDrawColor( Color( 255, 255, 255, 200 ))
 				surface.SetMaterial( PrinterUpgradeIcons[ k ] )
 				for b = 1, self:GetNWInt( k, 1 ) do
@@ -53,8 +54,8 @@ function ENT:Draw()
 				surface.SetDrawColor( Color( 255, 0, 0, 200 ))
 			end
 			surface.DrawTexturedRect( -TextWidth2*0.5 - 45, 18, 40, 40 )
-			draw.WordBox(2, -TextWidth*0.5, -30, "Money Printer", "HUDNumber5", Color(0, 0, 170, 100), Color(255,255,255,255))
-			draw.WordBox(2, -TextWidth2*0.5, 18, owner, "HUDNumber5", Color(0, 0, 170, 100), Color(255,255,255,255))
+			draw.WordBox(2, -TextWidth*0.5, -30, "Money Printer", PRINTER_FONT, Color(0, 0, 170, 100), Color(255,255,255,255))
+			draw.WordBox(2, -TextWidth2*0.5, 18, owner, PRINTER_FONT, Color(0, 0, 170, 100), Color(255,255,255,255))
 		end
 	cam.End3D2D()
 end
