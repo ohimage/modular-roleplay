@@ -25,15 +25,9 @@ AccessorFunc( PANEL, "m_strIconName", 		"IconName" )
 function PANEL:Init()
 
 	self:SetDoubleClickingEnabled( false )
-<<<<<<< .mine
 	self.Buttons = {}
 	self:SetText("")
 	self:SetTitle("")
-=======
-	self:SetText( "" )
-	self.Buttons = {}
-	
->>>>>>> .r25
 	self.Icon = vgui.Create( "ModelImage", self )
 	self.Icon:SetMouseInputEnabled( false )
 	self.Icon:SetKeyboardInputEnabled( false )
@@ -68,8 +62,6 @@ function PANEL:DoClick(...)
 	end
 end
 
-<<<<<<< .mine
-
 surface.CreateFont( "NRP_IconButton",
 	{
 		font      = "coolvetica",
@@ -83,24 +75,7 @@ function PANEL:SetTitle( text )
 	surface.SetFont( "NRP_IconButton" )
 	self.text_size = { surface.GetTextSize( text ) }
 end
- 
-=======
 
-surface.CreateFont( "NRP_IconButton",
-	{
-		font      = "coolvetica",
-		size      = 15,
-		weight    = 100
-	}
- )
-
-function PANEL:SetText( text )
-	self.text = text
-	surface.SetFont( "NRP_IconButton" )
-	self.text_size = { surface.GetTextSize( text ) }
-end
- 
->>>>>>> .r25
 function PANEL:Paint( w, h )
 end
 
@@ -114,7 +89,6 @@ function PANEL:AddButton( text, onClicked )
 end
 
 function PANEL:PaintOver( w, h)
-<<<<<<< .mine
 	surface.SetFont( "NRP_IconButton" )
 	surface.SetTextColor( Color(255, 255, 255) )
 	if( self.Hovered )then
@@ -143,26 +117,6 @@ function PANEL:PaintOver( w, h)
 		surface.SetTextPos( w / 2 - self.text_size[1] / 2, ypos )
 		surface.DrawText( self.text )
 	end
-=======
-	surface.SetFont( "NRP_IconButton" )
-	surface.SetTextColor( Color(255, 255, 255) )
-	if( self.Hovered )then
-		for i = 1, #self.Buttons do
-			local cbut = self.Buttons[ i ]
-			local ypos = h - 20 * i
-			surface.SetDrawColor( Color( 0, 0, 0 ) )
-			surface.DrawRect( 0, ypos, w, 15)
-			surface.SetTextPos( w / 2 - cbut.text_size[1] / 2, ypos)
-			surface.DrawText( cbut.text )
-		end
-	else
-		local ypos = h - 20
-		surface.SetDrawColor( Color( 0, 0, 0 ) )
-		surface.DrawRect( 0, ypos, w, 15)
-		surface.SetTextPos( w / 2 - self.text_size[1] / 2, ypos )
-		surface.DrawText( self.text )
-	end
->>>>>>> .r25
 end
 
 function PANEL:PerformLayout()

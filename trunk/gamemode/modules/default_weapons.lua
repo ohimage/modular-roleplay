@@ -223,3 +223,10 @@ NRP.AddCustomShipment('Frag Grenade',{
 	category = 'Grenades'
 })
 -- End of file.
+
+NRP.AddCustomEntity('Money Printer',{
+	model = 'models/weapons/w_eq_fraggrenade.mdl',
+	class = 'money_printer',
+	price = 1000,
+	category = 'Entities'
+})

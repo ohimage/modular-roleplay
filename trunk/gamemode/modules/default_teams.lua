@@ -173,12 +173,11 @@ You may not arrest anyone without just cause!!!]]
 TEAM_CHIEF = NRP.AddCustomTeam( 'Chief', {
 	model = "models/player/Combine_Soldier_PrisonGuard.mdl",
 	color = Color( 0, 55, 175, 255),
-	vote = true,
 	command = 'chief',
 	weapons = { 'weapon_375', 'arrest_stick', 'unarrest_stick' },
 	limit = 1,
 	IsCP = true,
-	CanSetJail = true
+	CanSetJail = true,
 	group = GROUP_POLICE,
 	desc = [[
 As police Chief you must listen to informants and keep track of the crime paturns.
