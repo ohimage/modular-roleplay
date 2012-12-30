@@ -190,4 +190,4 @@ net.Receive("Printer.Upgrade",function( length, ply )
 	else
 		NRP.Notice(ply, 5, "You cant afford this.", NOTIFY_ERROR)
 	end
-end)
+end) 
