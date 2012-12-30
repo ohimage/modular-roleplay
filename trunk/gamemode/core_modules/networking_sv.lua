@@ -77,6 +77,32 @@ function GM:PlayerReadyForData( ply )
 		end
 	end
 end
+<<<<<<< .mine
+
+util.AddNetworkString("NRP_CanReceive")
+util.AddNetworkString("NRP_IBeReady")
+local function isDataReady( ply, count )
+	if( ply.dataReady )then
+		ply.dataReady = nil
+		NRP.LoadMessage(NRP.color.white,"Player "..ply:Name().." is ready to receive data.")
+		hook.Call("PlayerReadyForData",GAMEMODE, ply )
+	else
+		net.Start("NRP_CanReceive")
+		net.Send( ply )
+		timer.Simple( 1, function()
+			isDataReady( ply, count + 1 )
+		end)
+	end
+end
+
+net.Receive( "NRP_IBeReady", function( length, ply )
+	if( length > 10 )then
+		ply:Kick("Error Net responce overflow.")
+	end
+	ply.dataReady = true
+end)
+
+=======
 
 util.AddNetworkString("NRP_CanReceive")
 util.AddNetworkString("NRP_IBeReady")
@@ -103,6 +129,7 @@ net.Receive( "NRP_IBeReady", function( length, ply )
 	ply.dataReady = true
 end)
 
+>>>>>>> .r25
 function GM:PlayerInitialSpawn( ply )
 	isDataReady( ply, 0 )
 end
