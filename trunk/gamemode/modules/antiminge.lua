@@ -37,8 +37,40 @@ function GM:CanProperty( ply, ent )
 	end
 end
 
+<<<<<<< .mine
+hook.Add("PlayerGiveSWEP","NO SWEPS",function( ply, class, wep )
+	NRP.Notice( ply, 6, "ERROR: You do not have permission to spawn weapons.", NOTIFY_ERROR)
+	if( NRP.cfg.CanGiveSWEP )then
+		return NRP.cfg.CanGiveSWEP( ply )
+	else
+		return ply:IsSuperAdmin()
+	end
+end)
+
+hook.Add("PlayerSpawnSENT","NO SENTS",function( ply, class, wep )
+	NRP.Notice( ply, 6, "ERROR: You do not have permission to spawn weapons.", NOTIFY_ERROR)
+	if( NRP.cfg.CanSpawnSENT )then
+		return NRP.cfg.CanSpawnSENT( ply )
+	else
+		return ply:IsSuperAdmin()
+	end
+end)
+
+hook.Add("PlayerSpawnNPC","NO NPCS",function( ply, class, wep )
+	NRP.Notice( ply, 6, "ERROR: You do not have permission to spawn weapons.", NOTIFY_ERROR)
+	if( NRP.cfg.CanSpawnNPC )then
+		return NRP.cfg.CanSpawnNPC( ply )
+	else
+		return ply:IsSuperAdmin()
+	end
+end)
+
+function GM:GravGunPunt( ply )
+	return false
+=======
 function GM:PlayerSpawnSWEP( ply, class, wep )
 	print("Player tried to spawn a weapon.")
 	ply:ChatPrint("This functionality is diabled.")
 	return false;
+>>>>>>> .r25
 end
