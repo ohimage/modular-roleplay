@@ -87,7 +87,7 @@ function ENT:Destruct()
 	for i = 0, math.random( 1, 4 ) do
 		DarkRPCreateScrapMetal( self:GetPos() + randVec( - 20, 20 ), math.random( 30, 200 ) ):SetVelocity( randVec( -40, 40 ) )
 	end
-	GAMEMODE:Notify(self.dt.owning_ent, 6, "Your money printer has exploded!", NOTIFY_ERROR )
+	NRP.Notice(self.dt.owning_ent, 6, "Your money printer has exploded!", NOTIFY_ERROR )
 end
 
 function ENT:BurstIntoFlames()
@@ -191,3 +191,10 @@ net.Receive("Printer.Upgrade",function( length, ply )
 		NRP.Notice(ply, 5, "You cant afford this.", NOTIFY_ERROR)
 	end
 end) 
+
+function ENT:OnLockPicked( ply )
+	NRP.Notice(self.dt.owning_ent, 4, "Someone has stolen your printer!")
+	self.dt.owning_ent = ply
+	NRP.Notice(self.dt.owning_ent, 4, "This printer is now yours!")
+	confetti( self:GetPos() ) -- You have a new printer... lets party!!!
+end

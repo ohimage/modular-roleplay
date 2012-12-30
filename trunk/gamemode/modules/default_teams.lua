@@ -102,7 +102,6 @@ GROUP_UNDERWORLD = NRP.AddTeamGroup("Under World", { } )
 TEAM_GANG = NRP.AddCustomTeam( 'Gangster', {
 	model = NRP.SHADY_MODELS,
 	color = Color( 155, 155, 155, 255),
-	weapons = {'weapon_crowbar'},
 	vote = false,
 	command = 'gangster',
 	limit = 6,
@@ -121,6 +120,7 @@ TEAM_MOBBOSS = NRP.AddCustomTeam( 'Mob Boss', {
 	vote = false,
 	command = 'mobboss',
 	limit = 1,
+	weapons = {'unarrest_stick','weapon_crowbar','lockpick'},
 	group = GROUP_UNDERWORLD,
 	desc = [[
 The Mob Boss is the leader of the Underworld of criminals and other dispicible charactors.
@@ -189,7 +189,7 @@ YOU MAY NOT WORK WITH CRIME ORGANISATIONS OR OVERTHROW THE MAYOR.
 	vote = true
 })
 
-TEAM_GUNDEALER = NRP.AddCustomTeam( 'Gun Dealer', {
+TEAM_GUN = NRP.AddCustomTeam( 'Gun Dealer', {
 	model = "models/player/monk.mdl",
 	color = Color( 255, 155, 0, 255),
 	command = 'gundealer',
@@ -200,7 +200,6 @@ They are required to setup shops and take clients selling guns. They may sell th
 Gun Dealers may be arrested for selling guns that are specified as illegal by the city police!
 ]]
 })
-
 
 -- the default team for players who have just joined.
 NRP.cfg.DefaultTeam = TEAM_CITIZEN

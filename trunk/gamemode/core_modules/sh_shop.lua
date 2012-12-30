@@ -72,20 +72,22 @@ if(SERVER)then
 			return
 		end
 		local id = tonumber( tbl[1] )
-		local count = tonumber( tbl[2] )
+		local count = tonumber( tbl[2] ) or 1
 		if( not id or not count or not shipments[ id ] )then
 			NRP.Notice( ply, 4, 'Invalid item ID or Count Given.', NOTIFY_ERROR )
 			return
 		end
 		local curShip = shipments[ id ]
 		if( curShip.isEntity == true )then
-			NRP.Notice( ply, 4, 'Item is an entity. Only buy 1 at a time.', NOTIFY_ERROR )
-		end
-		if( not curShip.amounts[ count ] )then
+			if( count ~= 1 )then
+				NRP.Notice( ply, 4, 'Item is an entity. Only buy 1 at a time.', NOTIFY_ERROR )
+				return
+			end
+		elseif( not curShip.amounts[ count ] )then
 			NRP.Notice( ply, 4, 'Invalid item quantity given.', NOTIFY_ERROR )
 			return
 		end
-		local cost = curShip.price * count * curShip.amounts[ count ]
+		local cost = curShip.price * count * ( curShip.amounts[ count ] or 1 )
 		if( not ply:CanAfford( cost ) )then -- make sure the player can afford the price.
 			NRP.Notice( ply, 4, 'You cant afford this shipment!', NOTIFY_ERROR )
 			return
@@ -109,6 +111,7 @@ if(SERVER)then
 			local e = ents.Create(curShip.class)
 			e:SetPos( ply:GetLimitedEyeTrace( 100 ).HitPos )
 			e.dt.owner = ply
+			e.dt.owning_ent = ply
 			
 			e:Spawn()
 			e:Activate()
@@ -135,6 +138,7 @@ hook.Add("NeoRP_CanBuyShipment","TeamCheck",function(ply, ship, arg)
 			if( not table.HasValue( ship.teams, ply:Team() ) )then
 				return "You arn't the right team to buy this!"
 			end
+			return true
 		elseif( type( ship.teams ) == 'number' )then
 			if( ship.teams ~= ply:Team() )then
 				return "You arnt the right team to buy this!"

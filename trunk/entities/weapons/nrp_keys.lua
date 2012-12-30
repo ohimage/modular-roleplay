@@ -50,18 +50,49 @@ local function PlayerHasTeamAccess( ply, door )
 	return false
 end
 
+local function PlayerCanOpenDoorMenu( ply, door )
+	if( NRP.cfg.CanEditDoors( ply ) )then
+		return true -- overrides to true.
+	elseif( door:Door_GetFlag("disabled") == 1 )then
+		return false
+	elseif( door:Door_GetFlag("team_access") == 1 )then
+		return false
+	elseif( door:GetNWEntity( "owner" ) and ent:GetNWEntity( "owner" ) ~= ply )then
+		return false -- if the door is owned and the player isnt the owner... no menu for you.
+	end
+	return true -- defaults to true.
+end
+
+local function PlayerCanBuyDoor( ply, door )
+	if( IsValid( door:GetNWEntity('owner' ) ) )then return false end
+	if( door:Door_GetFlag("team_access") == 1 )then return false end
+	if( door:Door_GetFlag("disabled") == 1 )then return false end
+	return true
+end
+
+local function PlayerCanLockDoor( ply, door )
+	if( PlayerHasTeamAccess( ply, door ) )then
+		return true
+	end
+	if( IsValid( door:GetNWEntity('owner' ) ) and door:GetNWEntity('owner') == ply )then
+		return true
+	end
+	return false
+end
+
 hook.Add("NeoRP_IsLockable", "If Its a Door", function( ent )
 	if( ent:IsDoor() )then return true end
 end)
 function SWEP:PrimaryAttack()
 	if( CLIENT )then return end
 	local trace = self.Owner:GetEyeTrace()
+	if( trace.StartPos:Distance( trace.HitPos ) > 50 )then return end
 	if( not IsValid( trace.Entity ) )then return end
 	local lockable = hook.Call("NeoRP_IsLockable",GAMEMODE, trace.Entity )
 	if( lockable ~= true )then return end
 	local ent = trace.Entity
 	local owner = ent:GetNWEntity("owner")
-	if( not PlayerHasTeamAccess( self.Owner, ent ) and ( not IsValid( owner ) or owner ~= self.Owner ) )then
+	if( not PlayerCanLockDoor( self.Owner, ent ))then
 		NRP.Notice( self.Owner, 6, "You dont own this door.", NOTIFY_ERROR )
 		self.Owner:EmitSound("physics/wood/wood_crate_impact_hard2.wav", 100, math.random(90, 110))
 		return
@@ -77,12 +108,13 @@ end
 function SWEP:SecondaryAttack()
 	if( CLIENT )then return end
 	local trace = self.Owner:GetEyeTrace()
+	if( trace.StartPos:Distance( trace.HitPos ) > 50 )then return end
 	if( not IsValid( trace.Entity ) )then return end
 	local lockable = hook.Call("NeoRP_IsLockable",GAMEMODE, trace.Entity )
 	if( lockable ~= true )then return end
 	local ent = trace.Entity
 	local owner = ent:GetNWEntity("owner")
-	if( not PlayerHasTeamAccess( self.Owner, ent ) and ( not IsValid( owner ) or owner ~= self.Owner ) )then
+	if( not PlayerCanLockDoor( self.Owner, ent ))then
 		NRP.Notice( self.Owner, 6, "You dont own this door.", NOTIFY_ERROR )
 		self.Owner:EmitSound("physics/wood/wood_crate_impact_hard2.wav", 100, math.random(90, 110))
 		return
@@ -100,13 +132,18 @@ function SWEP:Reload()
 	if( CLIENT )then return end
 	if( self.NextReload and self.NextReload > CurTime() )then return end
 	local trace = self.Owner:GetEyeTrace()
+	if( trace.StartPos:Distance( trace.HitPos ) > 50 )then return end
 	if( not IsValid( trace.Entity ) )then return end
 	local lockable = hook.Call("NeoRP_IsLockable",GAMEMODE, trace.Entity )
 	if( lockable ~= true )then return end
 	local ent = trace.Entity
-	if( IsValid( ent:GetNWEntity( "owner" ) ) and ent:GetNWEntity( "owner" ) ~= self.Owner )then return end -- if this door isnt the player's door then he cant view the menu.
-	
-	if( not NRP.cfg.CanEditDoors( self.Owner ) and ( ent:Door_GetFlag("disabled") == 1 or ent:Door_GetFlag("team_access" ) == 1 ) )then return end -- door is not ownable.
+	local canOpen, message = PlayerCanOpenDoorMenu( self.Owner, ent )
+	if( not canOpen )then 
+		if( message )then
+			NRP.Notice( ply, 6, message, NOTIFY_ERROR )
+		end
+		return
+	end
 	
 	self:ShowKeyMenu( ent )
 	self.NextReload = CurTime() + 1
@@ -130,8 +167,7 @@ if(SERVER)then
 	NRP.AddChatCommand( 'buydoor', function( ply, arg )
 		local door = GetAimDoor( ply )
 		if( not IsValid( door ) )then return end
-		if(IsValid( door:GetNWEntity( "owner" ) ) )then return end
-		if( door:Door_GetFlag("disabled" ) == 1 )then return end
+		if( not PlayerCanBuyDoor( ply, door ) )then return end
 		
 		if( ply:CanAfford( NRP.cfg.DoorPrice ) )then
 			ply:TakeMoney( NRP.cfg.DoorPrice )

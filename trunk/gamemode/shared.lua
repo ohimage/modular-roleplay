@@ -1,6 +1,6 @@
 GM.Version = "1.0.0 Beta"
 GM.Name = "NeoRP"
-GM.Author = "By TheLastPenguin, Dev DotEXE"
+GM.Author = "By TheLastPenguin"
 
 include("config.lua")
 

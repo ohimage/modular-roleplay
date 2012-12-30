@@ -18,7 +18,7 @@ local function MakeShipmentIcon( item, parent )
 	icon:InvalidateLayout( true );
 	icon:SetModel( item.model )
 	icon:SetTitle( item.name )
-	if( item.single )then
+	if( item.isEntity )then
 		icon:AddButton( "Buy for $"..(item.price * 1 ), function()
 			LocalPlayer():ConCommand("say /buy "..item.id.." 1")
 		end)
@@ -64,7 +64,9 @@ ENTTAB.update = function( panel )
 	
 	local categories = {} -- table of the VGUI categories for shipments.
 	for k,v in pairs( NRP.shipments )do
+		print("Checking shipment "..v.name )
 		local canbuy = hook.Call("NeoRP_CanBuyShipment",GAMEMODE, LocalPlayer(), v, '' )
+		print("can buy is "..tostring( canbuy ) )
 		if( canbuy == true or canbuy == nil )then
 			if( not categories[ v.category or '' ] )then
 				print("Creating category panel. "..( v.category or 'default' ) )
