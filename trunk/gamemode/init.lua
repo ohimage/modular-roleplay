@@ -21,7 +21,7 @@ AddCSLuaFile("loader_cl.lua")
 AddCSLuaFile("loader_sh.lua")
 AddCSLuaFile("cl_fonts.lua")
 
-/*================
+/*================ 
 INCLUDE FILES
 ================*/
 include("shared.lua") -- load shared.lua first. Only extreamly general global functions should go there.
