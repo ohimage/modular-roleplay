@@ -37,6 +37,7 @@ function ENT:Use(activator,caller)
 		weapon:SetAngles(self:GetAngles())
 		weapon:Spawn()
 		weapon:Activate()
+		weapon:Use( activator, caller, USE_TOGGLE, 0 )
 		self:Remove()
 		return
 	end

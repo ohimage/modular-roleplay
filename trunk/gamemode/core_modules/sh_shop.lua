@@ -64,6 +64,54 @@ end
 BUYING SHIPMENTS
 =====================================*/
 if(SERVER)then
+	local function DoPlayerEntitySpawn( player, entity_name, model, distance )
+		local vStart = player:GetShootPos()
+		local vForward = player:GetAimVector()
+
+		local trace = {}
+		trace.start = vStart
+		trace.endpos = vStart + (vForward * ( distance or 2048 ))
+		trace.filter = player
+		
+		local tr = util.TraceLine( trace )
+
+		-- PrintTable( tr )
+
+		-- Prevent spawning too close
+		--if ( !tr.Hit || tr.Fraction < 0.05 ) then 
+		--	return 
+		--end
+		local ent = ents.Create( entity_name )
+		if ( !IsValid( ent ) ) then return end
+
+		local ang = player:EyeAngles()
+		ang.yaw = ang.yaw + 180 -- Rotate it 180 degrees in my favour
+		ang.roll = 0
+		ang.pitch = 0
+		
+		if (entity_name == "prop_ragdoll") then
+			ang.pitch = -90
+			tr.HitPos = tr.HitPos
+		end
+		if( model )then
+			ent:SetModel( model )
+		end
+		ent:SetSkin( iSkin )
+		ent:SetAngles( ang )
+		ent:SetBodyGroups( strBody )
+		ent:SetPos( tr.HitPos )
+
+		-- Attempt to move the object so it sits flush
+		-- We could do a TraceEntity instead of doing all 
+		-- of this - but it feels off after the old way
+
+		local vFlushPoint = tr.HitPos - ( tr.HitNormal * 512 )	-- Find a point that is definitely out of the object in the direction of the floor
+			vFlushPoint = ent:NearestPoint( vFlushPoint )			-- Find the nearest point inside the object to that point
+			vFlushPoint = ent:GetPos() - vFlushPoint				-- Get the difference
+			vFlushPoint = tr.HitPos + vFlushPoint					-- Add it to our target pos
+		return ent
+	end
+	
 	NRP.AddChatCommand('buy', function(ply, arg)
 		print("Did someone say buy?")
 		local tbl = string.Explode( ' ', arg )
@@ -78,6 +126,17 @@ if(SERVER)then
 			return
 		end
 		local curShip = shipments[ id ]
+		if( curShip.CanBuy )then
+			local res, message = curShip.CanBuy( ply, arg )
+			if( res == false )then
+				if( message )then
+					NRP.Notice( ply, 4, message, NOTIFY_ERROR )
+				else
+					NRP.Notice( ply, 4, "You can not buy this shipment.", NOTIFY_ERROR )
+				end
+				return
+			end
+		end
 		if( curShip.isEntity == true )then
 			if( count ~= 1 )then
 				NRP.Notice( ply, 4, 'Item is an entity. Only buy 1 at a time.', NOTIFY_ERROR )
@@ -108,22 +167,20 @@ if(SERVER)then
 		NRP.Notice( ply, 4, 'You bought a shipment of '.. curShip.name .. ' for '.. ( cost ) ) 
 		
 		if( curShip.isEntity )then -- allows for selling entities.
-			local e = ents.Create(curShip.class)
-			e:SetPos( ply:GetLimitedEyeTrace( 100 ).HitPos )
-			e.dt.owner = ply
-			e.dt.owning_ent = ply
-			
+			local e = DoPlayerEntitySpawn( ply, curShip.class, nil, 100 )
+			if( e.dt )then
+				e.dt.owner = ply
+				e.dt.owning_ent = ply
+			end
 			e:Spawn()
 			e:Activate()
 		else
-			local e = ents.Create("shipment")
-			e:SetPos( ply:GetLimitedEyeTrace( 100 ).HitPos )
+			local e = DoPlayerEntitySpawn( ply, 'shipment', curShip.crate, 100 )
 			e.dt.item = id
 			e.dt.owner = ply
 			e.dt.count = count
 			e.spawnfunc = curShip.spawnfunc
 			
-			e:SetModel( curShip.crate )
 			e:Spawn()
 			e:Activate()
 		end

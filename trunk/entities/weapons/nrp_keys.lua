@@ -57,7 +57,7 @@ local function PlayerCanOpenDoorMenu( ply, door )
 		return false
 	elseif( door:Door_GetFlag("team_access") == 1 )then
 		return false
-	elseif( door:GetNWEntity( "owner" ) and ent:GetNWEntity( "owner" ) ~= ply )then
+	elseif( IsValid( door:GetNWEntity( "owner" ) ) and door:GetNWEntity( "owner" ) ~= ply )then
 		return false -- if the door is owned and the player isnt the owner... no menu for you.
 	end
 	return true -- defaults to true.
@@ -75,6 +75,9 @@ local function PlayerCanLockDoor( ply, door )
 		return true
 	end
 	if( IsValid( door:GetNWEntity('owner' ) ) and door:GetNWEntity('owner') == ply )then
+		return true
+	end
+	if( door.DoorUsers and table.HasValue( door.DoorUsers, ply ) )then
 		return true
 	end
 	return false
@@ -223,15 +226,8 @@ if(SERVER)then
 			door:Door_SetFlag( "team_access", 0 )
 		end
 	end)
-elseif(CLIENT)then
-	surface.CreateFont( "NRP_DoorInfo",
-		{
-			font      = "roboto",
-			size      = 22,
-			weight    = 300
-		}
-	 )
 	
+elseif(CLIENT)then
 	local function DoorTeamsMenu( door )
 		local teams = NRP.GetAllTeams()
 		
@@ -266,6 +262,35 @@ elseif(CLIENT)then
 			end)
 		end )
 		EditType:Open()
+	end
+	
+	local function UserManagmentMenu( door )
+		local ChooseMode = DermaMenu() -- Creates the menu
+		ChooseMode:AddOption("Add Users",function()
+			timer.Simple(0,function()
+				Users = DermaMenu()
+				for k,v in pairs( player.GetAll() )do
+					if( v ~= LocalPlayer() and not table.HasValue( door.DoorUsers, v ) )then
+						Users:AddOption( v:Name(), function()
+							LocalPlayer():ConCommand("say /dooradduser "..v:UserID())
+						end)
+					end
+				end
+				Users:Open()
+			end)
+		end)
+		ChooseMode:AddOption("Remove Users", function()
+			timer.Simple(0,function()
+				Users = DermaMenu()
+				for k,v in pairs( door.DoorUsers )do
+					Users:AddOption( v:Name(), function()
+						LocalPlayer():ConCommand("say /doordeluser "..v:UserID() )
+					end)
+				end
+				Users:Open()
+			end)
+		end)
+		ChooseMode:Open()
 	end
 	
 	net.Receive( "NRP_ShowKeyMenu", function()
@@ -303,17 +328,24 @@ elseif(CLIENT)then
 			b_SetTitle:SetFont( "NRP_DoorInfo" )
 			b_SetTitle:SetText( "Set Door Title")
 			function b_SetTitle:DoClick()
-				local AimEnt = LocalPlayer():GetEyeTrace().Entity
-				local title
-				if( IsValid( AimEnt ))then
-					title = AimEnt:GetNWString("title")
-				end
+				title = door:GetNWString("title")
 				Derma_StringRequest( "Title?", "Enter new door title: ",  title or "A Door", function( str )
 						LocalPlayer():ConCommand("say /setdoortitle "..str )
 					end)
 				menu:Close()
 			end
 			dlist:AddItem( b_SetTitle )
+			
+			
+			local b_ManageUsers = vgui.Create("DButton")
+			b_ManageUsers:SetImage( "icon16/book_edit.png" )
+			b_ManageUsers:SetTall( 40 )
+			b_ManageUsers:SetFont( "NRP_DoorInfo" )
+			b_ManageUsers:SetText( "Add Door Owner")
+			function b_ManageUsers:DoClick()
+				UserManagmentMenu( door )
+			end
+			dlist:AddItem( b_ManageUsers )
 		else-- door is unowned so we show the buy menu.
 			local b_Buy = vgui.Create("DButton")
 			b_Buy:SetImage( "icon16/door.png" )

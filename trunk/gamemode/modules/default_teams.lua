@@ -51,37 +51,6 @@ end
 DEFAULT TEAMS
 =============================*/
 
-TEAM_DEVELOPER = NRP.AddCustomTeam( 'Developer', {
-	model = NRP.ALL_MODELS,
-	color = NRP.color.cyan,
-	vote = false,
-	weapons = {
-		'weapon_crowbar',
-		'weapon_pistol',
-		'weapon_smg1',
-		'weapon_crossbow',
-		'weapon_ar2',
-		'weapon_375',
-		'weapon_stunstick',
-		'weapon_rpg',
-		'weapon_frag',
-		'weapon_slam'
-		},
-	ModelColor = Color( 0, 0, 255 ),
-	command = 'developer',
-	limit = -1,
-	CustomCheck = function( ply )
-		if( ply:IsNRPDeveloper( ) )then
-			return true
-		else
-			return false, "You must be a NeoRP Developer to use this team."
-		end
-	end,
-	desc = [[
-NeoRP developer.
-One of the dedicated people who make this gamemode possible through their time and efforts spent in it's development.]]
-})
-
 TEAM_CITIZEN = NRP.AddCustomTeam( 'Citizen', {
 	model = NRP.CITIZEN_MODELS,
 	color = Color( 0, 155, 0, 255),
@@ -105,12 +74,25 @@ TEAM_GANG = NRP.AddCustomTeam( 'Gangster', {
 	vote = false,
 	command = 'gangster',
 	limit = 6,
-	group = GROUP_UNDERWORLD,
 	desc = [[
 The common Gangster is amongst the middle ranks of the organised crime world.
 Gangsters must obey the Mob Boss who is the leader of the organised crime world. You may not kill without the Mob Boss's permission. 
 You act as a thug for the Mob Boss carying out his dirty work while bringing the spoils back to him.
 Gangsters can not act on their own and require a mob boss to function.
+]]
+})
+
+TEAM_THIEF = NRP.AddCustomTeam( 'Thief', {
+	model = {'models/player/t_arctic.mdl','models/player/t_phoenix.mdl'},
+	color = Color( 155, 155, 155, 255),
+	weapons = {'lockpick'},
+	vote = false,
+	command = 'thief',
+	limit = 3,
+	desc = [[
+A common thief. The loest skum in the crime world, stealing the work of others.
+Thifs prowl the streets where the CP dare not roam, be it gang territory or deep tunnel networks, robbing unwitting people as they pass.
+Smarter thifs may find valuable loot by robbing homes and working with gangs to find targets. A thief should never have need of a gun, for his presence should not be noticed until the stolen items are discovered.
 ]]
 })
 
@@ -121,7 +103,6 @@ TEAM_MOBBOSS = NRP.AddCustomTeam( 'Mob Boss', {
 	command = 'mobboss',
 	limit = 1,
 	weapons = {'unarrest_stick','weapon_crowbar','lockpick'},
-	group = GROUP_UNDERWORLD,
 	desc = [[
 The Mob Boss is the leader of the Underworld of criminals and other dispicible charactors.
 He is the worst of the criminals and keeps the order and organises shady activities with his brutal tactics. The Mob Boss may order killings however he should not kill himself.
@@ -136,7 +117,6 @@ YOU MAY NOT RDM OR DECLARE WAR ON CITIZENS (police wars are ok if casualties are
 /*=============================
 POLICE TEAMS
 =============================*/
-GROUP_POLICE = NRP.AddTeamGroup("Police", { } )
 
 TEAM_MAYOR = NRP.AddCustomTeam( 'Mayor', {
 	model = "models/player/breen.mdl",
@@ -144,7 +124,6 @@ TEAM_MAYOR = NRP.AddCustomTeam( 'Mayor', {
 	vote = true,
 	command = 'mayor',
 	limit = 1,
-	group = GROUP_POLICE,
 	desc = [[
 Tme Mayor are in charge of the city acting as the voice of the people.
 It is your duty to represent the public rule and keep the public happy while maintaining safety and helping the economy if needed.
@@ -158,9 +137,8 @@ TEAM_POLICE = NRP.AddCustomTeam( 'Police', {
 	color = Color( 0, 0, 175, 255),
 	vote = true,
 	command = 'police',
-	weapons = {'weapon_pistol' , 'arrest_stick', 'unarrest_stick'},
-	limit = 1,
-	group = GROUP_POLICE,
+	weapons = {'weapon_real_cs_glock18' , 'arrest_stick', 'unarrest_stick'},
+	limit = 6,
 	IsCP = true,
 	desc = [[
 As a police officer it is your duty to keep law and order.
@@ -174,11 +152,10 @@ TEAM_CHIEF = NRP.AddCustomTeam( 'Chief', {
 	model = "models/player/Combine_Soldier_PrisonGuard.mdl",
 	color = Color( 0, 55, 175, 255),
 	command = 'chief',
-	weapons = { 'weapon_375', 'arrest_stick', 'unarrest_stick' },
+	weapons = { 'weapon_real_cs_desert_eagle','weapon_real_cs_xm1014', 'arrest_stick', 'unarrest_stick' },
 	limit = 1,
 	IsCP = true,
 	CanSetJail = true,
-	group = GROUP_POLICE,
 	desc = [[
 As police Chief you must listen to informants and keep track of the crime paturns.
 The Chief must organise police Patrols, instruct investigations, keep track of suspisicous players and reported activities, and investigate possibly dirty cops.
@@ -198,6 +175,20 @@ TEAM_GUN = NRP.AddCustomTeam( 'Gun Dealer', {
 Gun Dealers are responcible for the weapon supply to the city. 
 They are required to setup shops and take clients selling guns. They may sell their services entirely to one group such as a gang of the police but they may not use guns them selves.
 Gun Dealers may be arrested for selling guns that are specified as illegal by the city police!
+]]
+})
+
+TEAM_DRUG = NRP.AddCustomTeam( 'Drug Dealer', {
+	model = "models/player/soldier_stripped.mdl",
+	color = Color( 200, 0, 255, 255),
+	command = 'drug',
+	limit = 4,
+	desc = [[
+Drug dealers are the true skum of the city corrupting the youth population.
+You sell drugs to anyone who will buy, but will be hunted relentlessly by police if they catch you selling.
+A Successful Drug Dealer must be sly with their advertisements making it hard for CP to get any conclusive evidance.
+
+A Drug Dealer may also create more legitimate trades if you wish selling beer and cigarettes to bars.
 ]]
 })
 

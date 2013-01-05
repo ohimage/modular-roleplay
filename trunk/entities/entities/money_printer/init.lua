@@ -31,6 +31,7 @@ function ENT:Initialize()
 	timer.Simple(math.random(30, 35), function() PrintMore(self) end)
 	
 	self.IsLockPickable = true
+	self.CrashRecovery = true
 	
 	self:SetNWInt("Amount",1)
 	self:SetNWInt("Speed",1)

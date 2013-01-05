@@ -46,6 +46,8 @@ function Entity:LoadDoorData()
 		sql.SQLStr( math.Round( self:GetPos().x )), sql.SQLStr( math.Round( self:GetPos().y )), sql.SQLStr( math.Round( self:GetPos().z )), sql.SQLStr( game.GetMap() ) ) )
 	if( not res or not res[1] )then return nil end
 	local dat = res[1]
+	self.DoorUsers = {} -- table of alternate door users.
+	
 	self:SetNWString( 'title', dat.title )
 	if( tonumber( dat.locked ) == 0 )then
 		self:SetNWBool( 'locked', false)
@@ -64,6 +66,85 @@ function Entity:LoadDoorData()
 		end
 	end
 	return dat
+end
+
+if(SERVER)then
+
+	local function GetAimDoor( ply )
+		local trace = ply:GetEyeTrace()
+		if( not IsValid( trace.Entity ) )then return end
+		local lockable = hook.Call("NeoRP_IsLockable",GAMEMODE, trace.Entity )
+		if( lockable ~= true )then return end
+		local door = trace.Entity
+		return door
+	end
+	
+	util.AddNetworkString("NRP_SendDoorUser")
+	util.AddNetworkString("NRP_SendDoorUserTBL")
+	util.AddNetworkString("NRP_RequestDoorUsers")
+	NRP.AddChatCommand( 'dooradduser', function( ply, arg )
+		local door = GetAimDoor( ply )
+		if( not IsValid( door ) )then return end
+		
+		local uid = tonumber( arg )
+		local user = NULL
+		for k,v in pairs(player.GetAll())do
+			if( IsValid( v ) and v:UserID() == uid )then
+				user = v
+			end
+		end
+		if( not IsValid( user ) )then return end
+		if( table.HasValue( door.DoorUsers, user ) )then return end
+		table.insert( door.DoorUsers, user )
+		
+		net.Start("NRP_SendDoorUser")
+			net.WriteEntity( door )
+			net.WriteEntity( user )
+		net.Send( player.GetAll() )
+	end)
+	
+	NRP.AddChatCommand( 'doordeluser', function( ply, arg )
+		local door = GetAimDoor( ply )
+		if( not IsValid( door ) )then return end
+		
+		local uid = tonumber( arg )
+		local user = NULL
+		for k,v in pairs(door.DoorUsers)do
+			if( IsValid( v ) and v:UserID() == uid )then
+				table.remove( door.DoorUsers, k )
+				break
+			end
+		end
+		
+		net.Start("NRP_SendDoorUserTBL")
+			net.WriteEntity( door )
+			net.WriteTable( door.DoorUsers )
+		net.Send( player.GetAll() )
+	end)
+	
+	net.Receive("NRP_RequestDoorUsers",function(length, ply)
+		if( length > 255 )then return end
+		local door = GetAimDoor( ply )
+		if( not door )then return end
+
+		net.Start("NRP_SendDoorUserTBL")
+			net.WriteEntity( door )
+			net.WriteTable( door.DoorUsers )
+		net.Send( ply )
+	end)
+elseif(CLIENT)then
+	net.Receive("NRP_SendDoorUser",function()
+		local door = net.ReadEntity( )
+		local ply = net.ReadEntity( )
+		if( not door.DoorUsers )then door.DoorUsers = {} end
+		if( not IsValid( ply ) )then return end -- there are no users yet, we just needed to init the table.
+		table.insert( door.DoorUsers, ply )
+	end)
+	net.Receive("NRP_SendDoorUserTBL",function()
+		local door = net.ReadEntity( )
+		local plys = net.ReadTable( )
+		door.DoorUsers = plys
+	end)
 end
 
 /*================================
@@ -90,10 +171,11 @@ end
 if(CLIENT)then
 	local doors = {}
 	local function DoorCalculations( door )
-		if( door.frontCenter and door.backCenter and door.forwardAngle and door.backwardAngle and door.lastAngle and door.lastAngle == door:GetAngles() )then
+		if( door.frontCenter and door.backCenter and door.forwardAngle and door.backwardAngle and door.lastAngle and door.lastAngle == door:GetAngles() and door.lastPos == door:GetPos() )then
 			return end
 		local doorAngles = door:GetAngles()
 		door.lastAngle = doorAngles
+		door.lastPos = door:GetPos()
 		
 		local smallFrontVec = Vector( 0, 0, 0)
 		local _mins = door:OBBMins()
@@ -154,9 +236,16 @@ if(CLIENT)then
 			weight    = 300
 		}
 	 )
+	 surface.CreateFont( "NRP_DoorInfo", -- this is not for 2D3D info.
+		{
+			font      = "roboto",
+			size      = 22,
+			weight    = 300
+		}
+	 )
 	
 	local gradient = Material("gui/center_gradient")
-	local function DrawDoor( door )
+	local function DrawDoor( door, alpha )
 		local OBB = door:OBBMaxs() - door:OBBMins()
 		local wide = math.max( math.abs( OBB.y ), math.abs( OBB.x ) ) * 10
 		--print( OBB2.x.."-"..OBB2.y.."-"..OBB2.z )
@@ -184,7 +273,9 @@ if(CLIENT)then
 	function GM:PostDrawOpaqueRenderables()
 		lPos = LocalPlayer():EyePos()
 		for k,v in pairs( doors )do
-			if( v:GetPos():Distance( lPos ) < 1000 )then
+			local dist = v:GetPos():Distance( lPos )
+			if( dist < 1000 )then
+				local alpha = math.Clamp( 1000 - dist, 0, 255 )
 				DoorCalculations( v )
 				-- just think about it... the closest surface will be the forward facing one.
 				-- so why render the one facing backward?.. this if statement lets us skip it.
@@ -211,7 +302,30 @@ if(CLIENT)then
 		if( not IsValid( ent:GetNWEntity("owner")) and not ent:Door_GetFlag("disabled" ) == 1 )then -- stuff to draw when the door is owned.
 			draw.SimpleText( "Door is unowned. Press 'Reload' With keys to own.", "NRP_DoorInfo", ScrW() / 2 + 3, ScrH() * 0.6 + 3, Color( 0,0,0,155), TEXT_ALIGN_CENTER)
 			draw.SimpleText( "Door is unowned. Press 'Reload' With keys to own.", "NRP_DoorInfo", ScrW() / 2, ScrH() * 0.6, Color( 155,0,0,255), TEXT_ALIGN_CENTER)
-		end 
+		end
+		if( not ent.DoorUsers )then
+			if( not ent.PendingData )then
+				net.Start("NRP_RequestDoorUsers")
+				net.SendToServer()
+				ent.PendingData = true
+				timer.Simple( 2, function()
+					ent.PendingData = nil
+				end)
+			end
+		elseif( table.Count( ent.DoorUsers ) > 0 )then
+			local dy = ScrH() / 3 * 2 -- y delta.
+			surface.SetFont("NRP_DoorInfo")
+			surface.SetTextColor( Color( 255, 255, 255 ) )
+			surface.SetTextPos( ScrW() / 2 - 50, dy )
+			surface.DrawText( "Co-Owners" )
+			dy = dy + 30
+			for k,v in pairs( ent.DoorUsers )do
+				local w, h = surface.GetTextSize( v:Name() )
+				surface.SetTextPos( ScrW() / 2 - w/2, dy )
+				surface.DrawText( v:Name() )
+				dy = dy + h
+			end
+		end
 	end
 end
 

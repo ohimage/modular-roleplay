@@ -107,7 +107,7 @@ local function isDataReady( ply, count )
 		ply.dataReady = nil
 		NRP.LoadMessage(NRP.color.white,"Player "..ply:Name().." is ready to receive data.")
 		hook.Call("PlayerReadyForData",GAMEMODE, ply )
-	elseif( count > 10 )then
+	elseif( count > 120 )then
 		ply:Kick("Player did not receive data pack after 10 retries.")
 	else
 		net.Start("NRP_CanReceive")
