@@ -79,7 +79,7 @@ local function UpgradeMenu( ent )
 	UPanel:SetDraggable( true )
 	UPanel:ShowCloseButton( true )
 	UPanel:MakePopup()
-	UPanel:SetSkin("DarkRP")
+	UPanel:SetSkin("neorp")
 	
 	local List = vgui.Create("DPanelList", UPanel )
 	List:SetPos( 15, 30 )

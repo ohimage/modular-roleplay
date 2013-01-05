@@ -235,14 +235,6 @@ NRP.AddCustomShipment('Flash Grenade',{
 	teams = {TEAM_GUN}
 })
 
-NRP.AddCustomShipment('Smoke Grenade',{
-	model = 'models/weapons/w_eq_smokegrenade.mdl',
-	class = 'weapon_real_cs_smoke',
-	price = 303,
-	category = 'Grenades',
-	teams = {TEAM_GUN}
-})
-
 NRP.AddCustomShipment('Frag Grenade',{
 	model = 'models/weapons/w_eq_fraggrenade.mdl',
 	class = 'weapon_real_cs_grenade',
@@ -250,7 +242,83 @@ NRP.AddCustomShipment('Frag Grenade',{
 	category = 'Grenades',
 	teams = {TEAM_GUN}
 })
--- End of file.
+
+/*==================
+DRUGZ MOD
+==================*/
+NRP.AddCustomShipment('Water',{
+	model = 'models/drug_mod/the_bottle_of_water.mdl',
+	class = 'durgz_water',
+	price = 30,
+	category = 'Drugz',
+	teams = {TEAM_DRUG}
+})
+NRP.AddCustomShipment('Cigarettes',{
+	model = 'models/boxopencigshib.mdl',
+	class = 'durgz_cigarette',
+	price = 50,
+	category = 'Drugz',
+	teams = {TEAM_DRUG}
+})
+NRP.AddCustomShipment('Weed',{
+	model = 'models/katharsmodels/contraband/zak_wiet/zak_wiet.mdl',
+	class = 'durgz_weed',
+	price = 70,
+	category = 'Drugz',
+	teams = {TEAM_DRUG}
+})
+NRP.AddCustomShipment('Aspirin',{
+	model = 'models/jaanus/aspbtl.mdl',
+	class = 'drugz_aspirin',
+	price = 100,
+	category = 'Drugz',
+	teams = {TEAM_DRUG}
+})
+NRP.AddCustomShipment('Beer',{
+	model = 'models/drug_mod/alcohol_can.mdl',
+	class = 'durgz_alcohol',
+	price = 100,
+	category = 'Drugz',
+	teams = {TEAM_DRUG}
+})
+NRP.AddCustomShipment('Cocaine',{
+	model = 'models/cocn.mdl',
+	class = 'durgz_cocaine',
+	price = 250,
+	category = 'Drugz',
+	teams = {TEAM_DRUG}
+})
+NRP.AddCustomShipment('Heroine',{
+	model = 'models/katharsmodels/syringe_out/syringe_out.mdl',
+	class = 'durgz_heroine',
+	price = 200,
+	category = 'Drugz',
+	teams = {TEAM_DRUG}
+})
+NRP.AddCustomShipment('LSD',{
+	model = 'models/smile/smile.mdl',
+	class = 'drugz_lsd',
+	price = 125,
+	category = 'Drugz',
+	teams = {TEAM_DRUG}
+})
+NRP.AddCustomShipment('Mushrooms',{
+	model = 'models/ipha/mushroom_small.mdl',
+	class = 'drugz_mushroom',
+	price = 150,
+	category = 'Drugz',
+	teams = {TEAM_DRUG}
+})
+NRP.AddCustomShipment('PCP',{
+	model = 'models/marioragdoll/Super Mario Galaxy/star/star.mdl',
+	class = 'drugz_pcp',
+	price = 200,
+	category = 'Drugz',
+	teams = {TEAM_DRUG}
+})
+
+
+
 /*==================
 ENTITIES
 ==================*/
@@ -259,5 +327,10 @@ NRP.AddCustomEntity('Money Printer',{
 	model = 'models/props_c17/consolebox01a.mdl',
 	class = 'money_printer',
 	price = 1000,
-	category = 'Entities'
+	category = 'Entities',
+	CanBuy = function( ply )
+		if( ply:TeamTbl().IsCP == true )then
+			return false, "Police can not buy Money Printers."
+		end
+	end
 })

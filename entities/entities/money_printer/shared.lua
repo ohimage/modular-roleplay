@@ -54,4 +54,7 @@ function ENT:SetupDataTables()
 	for k,v in pairs( u )do
 		self:SetNWInt(k,1)
 	end
+	
+	self.RES = {}
+	self.RES.isConsumer = true
 end

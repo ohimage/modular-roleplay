@@ -9,4 +9,9 @@
 	</module>
 </xml>
 ]]
+local RES = NRP.RES
+local resources = RES.resources
 
+hook.Add( "ShouldCollide", "ShouldCollideTestHook", function(e1, e2)
+	
+end )
